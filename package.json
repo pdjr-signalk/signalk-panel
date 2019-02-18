@@ -1,0 +1,24 @@
+{
+  "name": "signalk-panel",
+  "version": "1.0.0",
+  "description": "Signal K instrument panel",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/preeve9534/signalk-panel.git"
+  },
+  "keywords": [
+    "signalk-node-server-plugin",
+    "signalk-webapp",
+    "panel"
+  ],
+  "author": "Paul Reeve <paul@pdjr.eu>",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/preeve9534/signalk-panel/issues"
+  },
+  "homepage": "https://github.com/preeve9534/signalk-panel#readme"
+}
