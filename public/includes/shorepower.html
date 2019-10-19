@@ -1,8 +1,9 @@
-<div class="lcars-bar lcars-u-1 horizontal button" style="position:relative;"
-     data-button="action:toggleOverlay,overlay:overlay-sensorlog.html,width:70%,height:70%,furtheraction:displaySensorLog,group:acpower,chart:day">
-    <div id="E01" class="lcars-label"
-         data-source="signalk:electrical.inverters.257.acin.power"
-         data-widget-digital="filter:multiplier:0.001:1">
+<!-- BATTERY CHARGER POWER -->
+<div class="lcars-bar lcars-u-1 horizontal both-divider button" style="position:relative;"
+     data-button='{ "function": "toggleOverlay", "params": { "overlay": "overlay-sensorlog.html", "function": "displaySensorLog", "params": { "group": "acpower", "chart": "day" } } }'>
+    <div id="E04" class="lcars-label"
+         data-source='{ "signalk": "electrical.inverters.257.acin.power" }'
+         data-widget-digital='{ "function": "multiplier,0.001,1" }'>
         SHR ---kW
     </div>
 </div>

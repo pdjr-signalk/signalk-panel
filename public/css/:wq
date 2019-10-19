@@ -1,24 +1,25 @@
 class Widget {
 
     constructor(parentNode, options) {
-        //console.log("Widget(%s, %s)...", JSON.stringify(parentNode), JSON.stringify(options)); 
+        console.log("Widget(%s, %s)...", JSON.stringify(parentNode), JSON.stringify(options)); 
 
         this.parentNode = parentNode;
+        this.component = null;
         this.timestamp = 0;
         this.latest = null;
 
-        var innerHtml = parentNode.innerHTML.trim();
-        parentNode.innerHTML = "";
+        var innerHtml = this.parentNode.innerHTML.trim();
+        this.parentNode.innerHTML = "";
         this.updateFunction = {
             "hgauge": Widget.makeHgauge,
             "digital": Widget.makeDigital,
             "indicator": Widget.makeIndicator,
             "label": Widget.makeLabel
-        }[options.type](parentNode, options, innerHtml);
+        }[options.type](this.parentNode, options, innerHtml);
     }
 
     static makeHgauge(parentNode, options, innerHtml) {
-        //console.log("Widget.makeHgauge(%s, %s, %s)...", JSON.stringify(parentNode), JSON.stringify(options), innerHtml);
+        console.log("Widget.makeHgauge(%s, %s, %s)...", JSON.stringify(parentNode), JSON.stringify(options), innerHtml);
 
         var retval = null, functions = [], func, card;
         if (options.range) {
@@ -34,7 +35,7 @@ class Widget {
         return(retval)
 
         function makeGrid(parentNode, min = 0, max = 100, ticks = 10, labels = true) {
-            //console.log("makeGrid(%s,%s,%s,%s,%s)...", JSON.stringify(parentNode), min, max, ticks, labels);
+            console.log("makeGrid(%s,%s,%s,%s,%s)...", JSON.stringify(parentNode), min, max, ticks, labels);
 
             var grid = document.createElement("div"); grid.classList.add("widget-hgauge-grid");
             for (var i = 1, tick; i < ticks; i++) {
@@ -48,7 +49,7 @@ class Widget {
         }
 
         function makeCursor(parentNode, options) {
-            //console.log("makeCursor(%s,%s)...", JSON.stringify(parentNode), JSON.stringify(options));
+            console.log("makeCursor(%s,%s)...", JSON.stringify(parentNode), JSON.stringify(options));
 
             var retval = null;
             var cursor = document.createElement("div"); cursor.classList.add("widget-hgauge-cursor");
@@ -63,7 +64,7 @@ class Widget {
         }
 
         function makeGaugeLabel(parentNode, options, innerHtml) {
-            //console.log("makeGaugeLabel(%s,%s,%s)...", JSON.stringify(parentNode), JSON.stringify(options), innerHtml);
+            console.log("makeGaugeLabel(%s,%s,%s)...", JSON.stringify(parentNode), JSON.stringify(options), innerHtml);
 
             var retval = null;
             var label = document.createElement("div"); label.classList.add("widget-hgauge-label");
@@ -115,7 +116,7 @@ class Widget {
     }
        
     static makeDigital(parentNode, options, innerHtml) {
-        //console.log("Widget.makeDigital(%s, %s, %s)...", JSON.stringify(parentNode), JSON.stringify(options), innerHtml);
+        console.log("Widget.makeDigital(%s, %s, %s)...", JSON.stringify(parentNode), JSON.stringify(options), innerHtml);
 
         var retval = null;
         var found = innerHtml.match(/(.*)---(.*)/);
@@ -125,7 +126,7 @@ class Widget {
         div.appendChild(span);
         if (found.length >= 3) div.appendChild(document.createTextNode(found[2]));
         parentNode.appendChild(div);
-        if (options["function"]) {
+        if (options.function) {
             var fargs = options["function"].split(",");
             var func = Widget.getUpdateFunction(fargs[0], fargs.slice(1));
             if (func != null) retval = function(v) { span.innerHTML = func(v); };
@@ -133,18 +134,18 @@ class Widget {
         return(retval);
     }
 
-    static makeIndicator(parentNode, options, innerHtml) {
-        //console.log("Widget.makeIndicator(%s,%s)...", JSON.stringify(parentNode), JSON.stringify(options));
+    static makeIndicator(parentNode, options) {
         var retval = null;
         var div = document.createElement("div"); div.className = "widget-indicator";
         parentNode.appendChild(div);
-        if (options["function"]) {
+        if (options.function) {
             var fargs = options["function"].split(",");
             var func = Widget.getUpdateFunction(fargs[0], fargs.slice(1));
             var states = options.state || { "on": "on", "off": "off" };
             if (func != null) retval = function(v) {
-                div.classList.remove(options.state.on);
-                div.classList.remove(options.state.off);
+                console.log("update indicator " + v);
+                div.classListRemove(options.state.on);
+                div.classListRemove(options.state.off);
                 if (func(v) != 0) { div.classList.add(options.state.on); } else { div.classList.add(options.state.off); }
             }
         }
@@ -153,15 +154,15 @@ class Widget {
 
     static makeLabel(parentNode, options, innerHtml) {
         var retval = null;
-        parentNode.innerHTML = innerHtml;
-        if (options["function"]) {
+        this.parentNode.innerHTML = innerHtml;
+        if (options.function) {
             var fargs = options["function"].split(",");
             var func = Widget.getUpdateFunction(fargs[0], fargs.slice(1));
-            var states = options.state;
-            if ((func != null) && (states != null)) retval = function(v) {
-                if (states.on) parentNode.classList.remove(states.on);
-                if (states.off) parentNode.classList.remove(states.off);
-                if (func(v)) { if (states.on) parentNode.classList.add(states.on); } else { if (states.off) parentNode.classList.add(states.off); }
+            var states = options.state || { "on": "on", "off": "off" };
+            if (func != null) retval = function(v) {
+                parentNode.classListRemove(options.state.on);
+                parentNode.classListRemove(options.state.off);
+                if (v) { parentNode.classList.add(options.state.on); } else { parentNode.classList.add(options.state.off); }
             }
         }
         return(retval);
@@ -176,11 +177,7 @@ class Widget {
 
         this.timestamp = Date().now;
         this.latest = value;
-        if (this.updateFunction != null) {
-            this.updateFunction(value);
-        } else {
-            console.log("missing update function for value %s", value);
-        }
+        if (this.updateFunction) this.updateFunction(value);
     }
 
     hasTimedout() {
@@ -192,7 +189,7 @@ class Widget {
     }
 
     static getUpdateFunction(name, [ arg1, arg2, arg3 ]) {
-        //console.log("getUpdateFunction(%s,%s,%s,%s)...", name, arg1, arg2, arg3);
+        console.log("getUpdateFunction(%s,%s,%s,%s)...", name, arg1, arg2, arg3);
 
         var retval = function(v) { return(v); }
         if (name) {
@@ -239,15 +236,14 @@ class Widget {
                     return((arg1)?v.toFixed(arg1):v);
                 }
             } else if (name == "rudderPercent") {
-                var min = arg1;
-                var max = arg2;
+                var fullscale = arg1 || 1.07;
                 retval = function(v) {
-                    return(((((v * 57.2958) / (max - min)) * 100) + 50));
+                    return(Math.round(((Number(v) / Number(fullscale)) * 50) + 50));
                 }
             } else if (name == "rudderAngle") {
-                var places = arg1 || 0;
+                var places = Number(arg1) || 0;
                 retval = function(v) {
-                    return(Math.abs(v * 57.2958).toFixed(places));
+                    return((v * 57.2958).toFixed(arg1));
                 }
             } else if (name == "temperature") { // convert temperature from Kelvin to Centigrade
                 var factor = arg1 || 1;
@@ -262,11 +258,6 @@ class Widget {
                 retval = function(v) {
                     var r = Math.round(((Number(v) - min) / (max - min)) * 10);
                     return((r < 0)?0:((r > 100)?100:r));
-                }
-            } else if (name == "loAlarm") {
-                var threshold = Number(arg1);
-                retval = function(v) {
-                    return(v < threshold);
                 }
             }
         }

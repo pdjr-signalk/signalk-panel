@@ -8,7 +8,6 @@
 	<script type="text/javascript" src="lib/widget.js"></script>
 	<script type="text/javascript" src="lib/script.js"></script>
 	<link rel="stylesheet" type="text/css" href="css/lcars.css">
-	<link rel="stylesheet" type="text/css" href="css/stylesheet.css">
 	<title>signalk-panel</title>
     <style>
         html, body {
@@ -92,12 +91,17 @@
                 <div data-include="includes/depth.html"></div>
                 <div class="lcars-bar spacer lcars-u-1-1"></div>
                 <div data-include="includes/seatemp.html"></div>
+                <div class="lcars-bar spacer lcars-u-1-1"></div>
+                <div data-include="includes/rudder.html"></div>
+                <div class="lcars-bar spacer lcars-u-1-1"></div>
             </div>
-
+        </div>
     </div>
-</div>
 
-<div id="overlay"></div>
+    <div id="overlay">
+        <div id="overlay-container">
+        </div>
+    </div>
 
 </body>
 </html>

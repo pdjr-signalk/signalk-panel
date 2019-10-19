@@ -31,3 +31,7 @@ $base-height: 3rem;
         min-width: $base-width * ($w + 0.5);
     }
 }
+.lcars-u-0-half {
+    width: $base-width * 0.5;
+    min-width: $base-width * 0.5;
+}

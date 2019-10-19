@@ -77,17 +77,50 @@ a.lcars-text-box {
 @-webkit-keyframes blinker {
   50% {
     opacity: 0.4; } }
+html, body {
+  height: 100%; }
+
+#overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 5;
+  width: 100%;
+  height: 100%;
+  display: none;
+  align-items: center;
+  justify-content: center; }
+
+#overlay-container {
+  display: table;
+  position: relative;
+  z-index: 10; }
+
+#overlay-chart {
+  width: 100vw;
+  min-width: 100vw;
+  height: 100vh;
+  min-height: 100vh;
+  position: relative; }
+
+#overlay-cancel {
+  width: 50px;
+  height: 50px;
+  position: absolute;
+  bottom: 0px;
+  left: 0px;
+  background: red;
+  z-index: 20; }
+
+.starboard::after {
+  content: "&rarr;"; }
+
 .theme-active-alert, .theme-active-alarm {
   animation: blinker 1s linear infinite; }
 
 .theme-active-alarm {
   color: red; }
-
-#overlay {
-  -webkit-user-drag: element; }
-
-.overlay-fullscreen {
-  width: 100%; }
 
 .widget-scroller-cell {
   content-align: bottom;
@@ -105,7 +138,7 @@ a.lcars-text-box {
 
 .widget-digital {
   position: relative;
-  z-index: 20; }
+  z-index: 2; }
 
 .widget-scroller {
   position: absolute;
@@ -117,9 +150,32 @@ a.lcars-text-box {
   pointer-events: none; }
 
 .widget-indicator {
-  background-color: gray !important;
+  background-color: gray;
   width: 10px;
   height: 5px; }
+
+.widget-hgauge-label .widget-hgauge-grid {
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%; }
+
+.widget-hgauge-label {
+  height: inherit; }
+
+.widget-hgauge-grid-tick {
+  position: absolute;
+  box-sizing: border-box;
+  left: 0px;
+  bottom: 0px;
+  border-right: gray solid 1px;
+  height: 5%; }
+
+.widget-hgauge-grid-tick::after {
+  opacity: 0.1;
+  content: attr(data-tick-value);
+  position: absolute;
+  transform: translate(-5px, -13px); }
 
 .relay .widget-indicator-on {
   background-color: orange !important; }
@@ -345,7 +401,7 @@ h6 {
 .lcars-bar.spacer {
   margin: 0;
   padding: 0;
-  background-color: transparent;
+  background-color: transparent !important;
   width: 0.25rem;
   min-width: 0.25rem;
   height: 0.25rem;
@@ -513,6 +569,9 @@ h6 {
 .lcars-element .lcars-element-decorator.right:after {
   left: 0.25rem;
   right: unset; }
+
+.lcars-element.content-left {
+  text-align: left; }
 
 .lcars-text-box,
 a.lcars-text-box {
@@ -3116,5 +3175,9 @@ a.lcars-text-box.blink {
 .lcars-u-16-half {
   width: 123.75rem;
   min-width: 123.75rem; }
+
+.lcars-u-0-half {
+  width: 3.75rem;
+  min-width: 3.75rem; }
 
 /*# sourceMappingURL=lcars.css.map */

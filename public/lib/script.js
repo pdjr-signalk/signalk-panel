@@ -1,15 +1,17 @@
 var WIDGET_DIRECTORY = {};
+const DEBUG = false;
 
 // Initialise page immediately it has loaded.
 //
 function init() {
     // Stop the browser from displaying the right-click context menu.
     document.addEventListener("contextmenu", (e) => { contextHandler(e); e.preventDefault(); });
+    window.event.cancelBubble = true;
 
     // Process "<div data-include=" tags by interpolating HTML fragments into page.
     interpolate();
     // Process "<div data-path=" tags by interpolating widgets and associating with Signal K updates.
-    WIDGET_DIRECTORY = configure();
+    configure();
     // Process "<div class="button... data-button=" tags by associating with event handler.
     activate("button", "click", FUNCTIONS);
     
@@ -57,34 +59,29 @@ function interpolate() {
  * configure() returns a data structure which maps paths to widgets.
  */
 function configure() {
-    var retval = {};
+    var widget, path, options, soptions, woptions;
     var elements = document.getElementsByTagName("div");
     [...elements].forEach(element => {
-        var soptions = objectify(element.getAttribute("data-source"));
-        var woptions = {};
-
-        for (var att, i = 0, atts = element.attributes, n = atts.length; i < n; i++) {
-            att = atts[i];
-            if (att.nodeName.startsWith("data-widget-")) {
-                woptions[att.nodeName] = objectify(att.value);
-            }
-        }
-
-        if ((soptions != null) && (woptions != {})) {
-            var path = (soptions.signalk)?soptions.signalk[0]:null;
-            if (path) {
-                var widget = new Widget(element, woptions);
-                if (widget) {
-                    if (path in retval) {
-                        retval[path].push({ "pathoptions": soptions, "element": element, "widget": widget });
-                    } else {
-                        retval[path] = [ { "pathoptions": soptions, "element": element, "widget": widget } ];
+        if (element.hasAttribute("data-source")) {
+            try { soptions = JSON.parse(element.getAttribute("data-source")); } catch(e) { soptions = null; console.log("error parsing %s", element.getAttribute("data-source")); }
+            if ((soptions != null) && ((path = soptions.signalk) != null)) {
+                if (!WIDGET_DIRECTORY[path]) WIDGET_DIRECTORY[path] = [];
+                var attributes = element.attributes;
+                [...attributes].forEach(attribute => {
+                    if (attribute.name.startsWith("data-widget-")) {
+                        try { woptions = JSON.parse(attribute.value); } catch(e) { woptions = null; console.log("error parsing %s", attribute.value); }
+                        if (woptions != null) {
+                            woptions["type"] = attribute.name.split("-").pop().trim();
+                            if ((widget = new Widget(element, woptions)) != null) {
+                                WIDGET_DIRECTORY[path].push(widget);
+                            }
+                        }
                     }
-                }
+                });
             }
         }
     });
-    return(retval);
+    return;
 }
 
 /**
@@ -101,26 +98,29 @@ function activate(selectorclass, eventtype, dictionary) {
 }
 
 function activateElement(element, eventtype, dictionary) {
-    //console.log("activateElement(%s,%s,%s)...", JSON.stringify(element), eventtype, JSON.stringify(dictionary));
-    var optionstring = element.getAttribute("data-button");
-    if (optionstring) {
-        var options = objectify(optionstring);
-        if ((options.action) && (Object.keys(dictionary).includes(options.action[0]))) {
-            element.addEventListener(eventtype, function(evt) {
-                dictionary[options.action[0]](evt.target, options);
-            });
+    console.log("activateElement(%s,%s,%s)...", JSON.stringify(element), eventtype, JSON.stringify(dictionary));
+    var options;
+    if (element.hasAttribute("data-button")) {
+        console.log("Got attribute");
+        try { options = JSON.parse(element.getAttribute("data-button")); } catch(e) { options = null; }
+        if (options) {
+            console.log("parsed attribute");
+            var func = options["function"];
+            if (func) {
+                if (Object.keys(dictionary).includes(func)) {
+                    element.addEventListener(eventtype, function(evt) {
+                        dictionary[func](evt.target, options.params, options.furtheraction);
+                    });
+                }
+            }
         }
     }
 }
 
 function updatePath(dictionary, path, value) {
-    if (dictionary[path]) {
-        dictionary[path].forEach(({ element, widget }) => {
-            widget.updateWidget(value);
-        });
-    } else {
-        console.log("updatePath: %s not found in dictionary", path);
-    }
+    if (DEBUG) console.log("updatePath(%s,%s,%s)...", "dictionary", path, value);
+
+    dictionary[path].forEach(widget => widget.update(value));
 }
 
 function updateStateFromWebSocket(dictionary) {
@@ -146,16 +146,4 @@ function updateStateFromWebSocket(dictionary) {
             }
         }
     }
-}
-
-function objectify(string) {
-    var retval = null;
-    if (string) {
-        retval = {};
-        string.split(",").forEach(property => {
-            var parts = property.split(":");
-            retval[parts[0]] = parts.slice(1);
-        });
-    }
-    return(retval);
 }
