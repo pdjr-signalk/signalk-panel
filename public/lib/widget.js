@@ -13,8 +13,60 @@ class Widget {
             "hgauge": Widget.makeHgauge,
             "digital": Widget.makeDigital,
             "indicator": Widget.makeIndicator,
-            "label": Widget.makeLabel
+            "label": Widget.makeLabel,
+            "vgauge": Widget.makeVgauge
         }[options.type](parentNode, options, innerHtml);
+    }
+
+    static makeVgauge(parentNode, options, innerHtml) {
+        console.log("Widget.makeVgauge(%s, %s, %s)...", JSON.stringify(parentNode), JSON.stringify(options), innerHtml);
+        var retval = null, functions = [], func, card;
+
+        if (options.range) {
+            var card = document.createElement("div"); card.className = "widget-vgauge-card";
+            //if ((options.scroller) && (func = makeScroller(card, options))) functions.push(func);
+            //if ((options.grid) && (func = makeGrid(card, options.range.min, options.range.max, options.ticks))) functions.push(func);
+            if ((options.cursor1) && (func = makeCursor(card, options.cursor1))) functions.push(func);
+            //if ((options.cursor2) && (func = makeCursor(card, options.cursor2))) functions.push(func);
+            if ((options.label) && (func = makeGaugeLabel(card, options.label, innerHtml))) functions.push(func);
+            parentNode.appendChild(card);
+            retval = function(v) { functions.map(f => f(v)); }
+        }
+        return(retval)
+
+        function makeCursor(parentNode, options) {
+            console.log("makeCursor(%s,%s)...", JSON.stringify(parentNode), JSON.stringify(options));
+
+            var retval = null;
+            var cursor = document.createElement("div"); cursor.classList.add("widget-vgauge-cursor");
+            if (options.color) cursor.classList.add(options.color);
+            parentNode.appendChild(cursor);
+            if (options["function"]) {
+                var fargs = options["function"].split(",");
+                var func = Widget.getUpdateFunction(fargs[0], fargs.slice(1));
+                if (func) retval = function(v) { cursor.style.minHeight = func(v) + "%"; };
+            }
+            return(retval);
+        }
+
+        function makeGaugeLabel(parentNode, options, innerHtml) {
+            //console.log("makeGaugeLabel(%s,%s,%s)...", JSON.stringify(parentNode), JSON.stringify(options), innerHtml);
+
+            var retval = null;
+            var label = document.createElement("div"); label.classList.add("widget-hgauge-label");
+            var found = innerHtml.match(/(.*)---(.*)/);
+            var span = document.createElement("span"); span.innerHTML = "***";
+            if (found.length >= 2) label.appendChild(document.createTextNode(found[1]));
+            label.appendChild(span);
+            if (found.length >= 3) label.appendChild(document.createTextNode(found[2]));
+            parentNode.appendChild(label);
+            if (options.function) {
+                var fargs = options["function"].split(",");
+                var func = Widget.getUpdateFunction(fargs[0], fargs.slice(1));
+                if (func != null) retval = function(v) { span.innerHTML = func(v); };
+            }
+            return(retval);
+        }
     }
 
     static makeHgauge(parentNode, options, innerHtml) {

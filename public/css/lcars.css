@@ -1,3 +1,49 @@
+.red {
+    background: #ff8f8f;
+}
+
+.blue {
+    background: #8f8fff;
+}
+
+.grey {
+    background: grey;
+}
+
+.white {
+    background: #afaf8f;
+}
+
+.tank-bar {
+    min-height: 300px;
+    height: 300px;
+    background: #6271c8;
+}
+
+.widget-vgauge-card {
+    height: 100%;
+    width: 100%;
+    position: relative;
+}
+
+.widget-vgauge-card {
+    font-weight: bold;
+    text-align: center;
+    color: black;
+}
+
+.widget-vgauge-card span::before {
+    content: "\A";
+    white-space: pre-line;
+}
+
+.widget-vgauge-cursor {
+    width: 90%;
+    position: absolute;
+    bottom: 0;
+    left: 5%;
+}
+
 .w3-theme-l5 {
   color: #000;
   background-color: #f3f4fb; }

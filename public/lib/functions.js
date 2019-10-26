@@ -16,6 +16,7 @@ FUNCTIONS = {
 	            if (currentContent != params.overlay) {
 	                loadHTML(overlayContainer, params.overlay, params.overlay, (container) => {
                         overlay.setAttribute("data-current-content", params.overlay);
+                        configure(container);
                         walkTheDOM(container, (node) => {
                             if ((node.classList) && (node.classList.contains("button"))) activateElement(node, "click", FUNCTIONS);
                         });

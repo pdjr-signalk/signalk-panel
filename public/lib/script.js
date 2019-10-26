@@ -9,11 +9,11 @@ function init() {
     window.event.cancelBubble = true;
 
     // Process "<div data-include=" tags by interpolating HTML fragments into page.
-    interpolate();
+    interpolate(document);
     // Process "<div data-path=" tags by interpolating widgets and associating with Signal K updates.
-    configure();
+    configure(document);
     // Process "<div class="button... data-button=" tags by associating with event handler.
-    activate("button", "click", FUNCTIONS);
+    activate(document, "button", "click", FUNCTIONS);
     
     httpGetAsync("/signalk/v1/api/vessels/self/name/", (v) => { document.getElementById("vesselName").innerHTML = v.replace(/"/g, ""); });
     
@@ -29,8 +29,8 @@ function init() {
  * The entire tag is replaced by the referenced content, or by an XML
  * comment if the content cannot be loaded.
  */
-function interpolate() {
-    var elements = document.getElementsByTagName("div");
+function interpolate(root) {
+    var elements = root.getElementsByTagName("div");
     [...elements].forEach(element => {
         var path = element.getAttribute("data-include");
         if (path) {
@@ -58,9 +58,9 @@ function interpolate() {
  *
  * configure() returns a data structure which maps paths to widgets.
  */
-function configure() {
+function configure(root) {
     var widget, path, options, soptions, woptions;
-    var elements = document.getElementsByTagName("div");
+    var elements = root.getElementsByTagName("div");
     [...elements].forEach(element => {
         if (element.hasAttribute("data-source")) {
             try { soptions = JSON.parse(element.getAttribute("data-source")); } catch(e) { soptions = null; console.log("error parsing %s", element.getAttribute("data-source")); }
@@ -90,8 +90,8 @@ function configure() {
  * must contain a tag named "data-button" which provides configuration for
  * actions to be performed by the specified handler. 
  */
-function activate(selectorclass, eventtype, dictionary) {
-    var elements = document.getElementsByClassName(selectorclass);
+function activate(root, selectorclass, eventtype, dictionary) {
+    var elements = root.getElementsByClassName(selectorclass);
     [...elements].forEach(element => {
         activateElement(element, eventtype, dictionary);
     });
