@@ -1,5 +1,4 @@
 var WIDGET_DIRECTORY = {};
-const DEBUG = false;
 
 // Initialise page immediately it has loaded.
 //
@@ -8,18 +7,13 @@ function init() {
     document.addEventListener("contextmenu", (e) => { contextHandler(e); e.preventDefault(); });
     window.event.cancelBubble = true;
 
-    // Process "<div data-include=" tags by interpolating HTML fragments into page.
-    interpolate(document);
-    // Process "<div data-path=" tags by interpolating widgets and associating with Signal K updates.
-    configure(document);
-    // Process "<div class="button... data-button=" tags by associating with event handler.
-    activate(document, "button", "click", FUNCTIONS);
-    
-    httpGetAsync("/signalk/v1/api/vessels/self/name/", (v) => { document.getElementById("vesselName").innerHTML = v.replace(/"/g, ""); });
-    
-    // Connect to Signal K server and start processing received data.
-    //
-    updateStateFromWebSocket(WIDGET_DIRECTORY);
+    var signalk = new SignalK("192.168.1.1", 3000, FunctionFactory.getFilter, Widget.createWidget);
+    var pageutils = new PageUtils({ "overlayOnLoad": function(r) { signalk.registerWidgets(r, Widget.createWidget); }});
+    PageUtils.include(document);
+    signalk.interpolateValues(document);
+
+    signalk.registerWidgets(document);
+    signalk.subscribe();
 }
 
 /**
@@ -63,13 +57,21 @@ function configure(root) {
     var elements = root.getElementsByTagName("div");
     [...elements].forEach(element => {
         if (element.hasAttribute("data-source")) {
-            try { soptions = JSON.parse(element.getAttribute("data-source")); } catch(e) { soptions = null; console.log("error parsing %s", element.getAttribute("data-source")); }
+            try {
+                soptions = JSON.parse(element.getAttribute("data-source"));
+            } catch(e) {
+                soptions = null; console.log("error parsing %s", element.getAttribute("data-source"));
+            }
             if ((soptions != null) && ((path = soptions.signalk) != null)) {
                 if (!WIDGET_DIRECTORY[path]) WIDGET_DIRECTORY[path] = [];
                 var attributes = element.attributes;
                 [...attributes].forEach(attribute => {
                     if (attribute.name.startsWith("data-widget-")) {
-                        try { woptions = JSON.parse(attribute.value); } catch(e) { woptions = null; console.log("error parsing %s", attribute.value); }
+                        try {
+                            woptions = JSON.parse(attribute.value);
+                        } catch(e) {
+                            woptions = null; console.log("error parsing %s", attribute.value);
+                        }
                         if (woptions != null) {
                             woptions["type"] = attribute.name.split("-").pop().trim();
                             if ((widget = new Widget(element, woptions)) != null) {

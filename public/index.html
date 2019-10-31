@@ -3,9 +3,10 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<script type="text/javascript" src="lib/drag.js"></script>
-	<script type="text/javascript" src="lib/functions.js"></script>
-	<script type="text/javascript" src="lib/utils.js"></script>
-	<script type="text/javascript" src="lib/widget.js"></script>
+	<script type="text/javascript" src="lib/FunctionFactory.js"></script>
+	<script type="text/javascript" src="lib/Widget.js"></script>
+	<script type="text/javascript" src="lib/pageutils.js"></script>
+	<script type="text/javascript" src="lib/signalk.js"></script>
 	<script type="text/javascript" src="lib/script.js"></script>
 	<link rel="stylesheet" type="text/css" href="css/lcars.css">
 	<title>signalk-panel</title>
@@ -40,11 +41,7 @@
             <div class="lcars-bar horizontal lcars-p-1"></div>
             <div class="lcars-bar fill horizontal both-divider"></div>
             <div class="lcars-bar horizontal">
-                <div class="lcars-title right">
-                    <span id="vesselName">
-                        ---
-                    </span>
-                </div>
+                <div class="signalk lcars-title right" data-source='{ "signalk": "name" }'></div>
             </div>
             <div class="lcars-bar horizontal right-end decorated"></div>
         </div>
@@ -98,10 +95,7 @@
         </div>
     </div>
 
-    <div id="overlay">
-        <div id="overlay-container">
-        </div>
-    </div>
+    <div data-include="includes/overlay.html"></div>
 
 </body>
 </html>

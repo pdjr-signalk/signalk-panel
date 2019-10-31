@@ -1,3 +1,16 @@
+.popup-parent .popup {
+    display: none;
+}
+
+.popup-parent:hover .popup {
+    display: block;
+}
+
+.popup {
+    position: absolute;
+    z-index: 10;
+}
+
 .red {
     background: #ff8f8f;
 }
@@ -29,7 +42,7 @@
 .widget-vgauge-card {
     font-weight: bold;
     text-align: center;
-    color: black;
+    color: white;
 }
 
 .widget-vgauge-card span::before {

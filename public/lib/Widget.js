@@ -1,7 +1,11 @@
 class Widget {
 
-    constructor(parentNode, options) {
-        //console.log("Widget(%s, %s)...", JSON.stringify(parentNode), JSON.stringify(options)); 
+    static createWidget(parentNode, options, ffactory) {
+        return(new Widget(parentNode, options, ffactory));
+    }
+
+    constructor(parentNode, options, ffactory) {
+        //console.log("Widget(%s,%s,%s)...", JSON.stringify(parentNode), JSON.stringify(options), JSON.stringify(ffactory)); 
 
         this.parentNode = parentNode;
         this.timestamp = 0;
@@ -15,11 +19,11 @@ class Widget {
             "indicator": Widget.makeIndicator,
             "label": Widget.makeLabel,
             "vgauge": Widget.makeVgauge
-        }[options.type](parentNode, options, innerHtml);
+        }[options.type](parentNode, options, innerHtml, ffactory);
     }
 
-    static makeVgauge(parentNode, options, innerHtml) {
-        console.log("Widget.makeVgauge(%s, %s, %s)...", JSON.stringify(parentNode), JSON.stringify(options), innerHtml);
+    static makeVgauge(parentNode, options, innerHtml, ffunc) {
+        //console.log("Widget.makeVgauge(%s, %s, %s)...", JSON.stringify(parentNode), JSON.stringify(options), innerHtml);
         var retval = null, functions = [], func, card;
 
         if (options.range) {
@@ -35,7 +39,7 @@ class Widget {
         return(retval)
 
         function makeCursor(parentNode, options) {
-            console.log("makeCursor(%s,%s)...", JSON.stringify(parentNode), JSON.stringify(options));
+            //console.log("makeCursor(%s,%s)...", JSON.stringify(parentNode), JSON.stringify(options));
 
             var retval = null;
             var cursor = document.createElement("div"); cursor.classList.add("widget-vgauge-cursor");
@@ -43,7 +47,7 @@ class Widget {
             parentNode.appendChild(cursor);
             if (options["function"]) {
                 var fargs = options["function"].split(",");
-                var func = Widget.getUpdateFunction(fargs[0], fargs.slice(1));
+                var func = ffunc(fargs[0], fargs.slice(1));
                 if (func) retval = function(v) { cursor.style.minHeight = func(v) + "%"; };
             }
             return(retval);
@@ -60,16 +64,16 @@ class Widget {
             label.appendChild(span);
             if (found.length >= 3) label.appendChild(document.createTextNode(found[2]));
             parentNode.appendChild(label);
-            if (options.function) {
+            if (options["function"]) {
                 var fargs = options["function"].split(",");
-                var func = Widget.getUpdateFunction(fargs[0], fargs.slice(1));
+                var func = ffunc(fargs[0], fargs.slice(1));
                 if (func != null) retval = function(v) { span.innerHTML = func(v); };
             }
             return(retval);
         }
     }
 
-    static makeHgauge(parentNode, options, innerHtml) {
+    static makeHgauge(parentNode, options, innerHtml, ffunc) {
         //console.log("Widget.makeHgauge(%s, %s, %s)...", JSON.stringify(parentNode), JSON.stringify(options), innerHtml);
 
         var retval = null, functions = [], func, card;
@@ -108,7 +112,7 @@ class Widget {
             parentNode.appendChild(cursor);
             if (options["function"]) {
                 var fargs = options["function"].split(",");
-                var func = Widget.getUpdateFunction(fargs[0], fargs.slice(1));
+                var func = ffunc(fargs[0], fargs.slice(1));
                 if (func) retval = function(v) { cursor.style.width = func(v) + "%"; };
             }
             return(retval);
@@ -125,9 +129,9 @@ class Widget {
             label.appendChild(span);
             if (found.length >= 3) label.appendChild(document.createTextNode(found[2]));
             parentNode.appendChild(label);
-            if (options.function) {
+            if (options["function"]) {
                 var fargs = options["function"].split(",");
-                var func = Widget.getUpdateFunction(fargs[0], fargs.slice(1));
+                var func = ffunc(fargs[0], fargs.slice(1));
                 if (func != null) retval = function(v) { span.innerHTML = func(v); };
             }
             return(retval);
@@ -166,7 +170,7 @@ class Widget {
 
     }
        
-    static makeDigital(parentNode, options, innerHtml) {
+    static makeDigital(parentNode, options, innerHtml, ffunc) {
         //console.log("Widget.makeDigital(%s, %s, %s)...", JSON.stringify(parentNode), JSON.stringify(options), innerHtml);
 
         var retval = null;
@@ -179,20 +183,20 @@ class Widget {
         parentNode.appendChild(div);
         if (options["function"]) {
             var fargs = options["function"].split(",");
-            var func = Widget.getUpdateFunction(fargs[0], fargs.slice(1));
+            var func = ffunc(fargs[0], fargs.slice(1));
             if (func != null) retval = function(v) { span.innerHTML = func(v); };
         }
         return(retval);
     }
 
-    static makeIndicator(parentNode, options, innerHtml) {
+    static makeIndicator(parentNode, options, innerHtml, ffunc) {
         //console.log("Widget.makeIndicator(%s,%s)...", JSON.stringify(parentNode), JSON.stringify(options));
         var retval = null;
         var div = document.createElement("div"); div.className = "widget-indicator";
         parentNode.appendChild(div);
         if (options["function"]) {
             var fargs = options["function"].split(",");
-            var func = Widget.getUpdateFunction(fargs[0], fargs.slice(1));
+            var func = ffunc(fargs[0], fargs.slice(1));
             var states = options.state || { "on": "on", "off": "off" };
             if (func != null) retval = function(v) {
                 div.classList.remove(options.state.on);
@@ -203,12 +207,12 @@ class Widget {
         return(retval);
     }
 
-    static makeLabel(parentNode, options, innerHtml) {
-        var retval = null;
+    static makeLabel(parentNode, options, innerHtml, ffunc) {
+        var retval = function(v) { return(v); };
         parentNode.innerHTML = innerHtml;
         if (options["function"]) {
             var fargs = options["function"].split(",");
-            var func = Widget.getUpdateFunction(fargs[0], fargs.slice(1));
+            var func = ffunc(fargs[0], fargs.slice(1));
             var states = options.state;
             if ((func != null) && (states != null)) retval = function(v) {
                 if (states.on) parentNode.classList.remove(states.on);
@@ -243,89 +247,6 @@ class Widget {
         return(JSON.stringify(this));
     }
 
-    static getUpdateFunction(name, [ arg1, arg2, arg3 ]) {
-        //console.log("getUpdateFunction(%s,%s,%s,%s)...", name, arg1, arg2, arg3);
-
-        var retval = function(v) { return(v); }
-        if (name) {
-            if (name == "percent") {
-                var min = arg1 || 0;
-                var max = arg2 || 100;
-                var invert = ((arg3) && (arg3 == "invert"))?true:false;
-                retval = function(v) { 
-                    var r = Math.round((v / (max - min)) * 100); r = (r < 0)?0:((r > 100)?100:r); 
-                    return((invert)?(100 - r):r); 
-                }
-            } else if (name == "getDate") {
-                retval = function(v) { 
-                    return(v.substr(0, v.indexOf('T'))); 
-                }
-            } else if (name == "getTime") {
-                retval = function(v) { 
-                    return(v.substr(v.indexOf('T')+1)); 
-                }
-            } else if (name == "toLatitude") {
-                retval = function({ longitude, latitude }) { 
-                    return(Widget.degToDMS(latitude, ['N','S'])); 
-                }
-            } else if (name == "toLongitude") {
-                retval = function({ longitude, latitude }) { 
-                    return(Widget.degToDMS(longitude, ['E','W'])); 
-                }
-            } else if (name == "toDegrees") {
-                retval = function(radians) { 
-                    return(("00" + (Math.round(radians * 57.2958) % 360)).slice(-3));
-                }
-            } else if (name == "multiplier") {
-                var multiplier = arg1 || 1;
-                var places = arg2 || 0;
-                retval = function(v) { 
-                    return((v * multiplier).toFixed(places)); 
-                }
-            } else if (name == "offset") {
-                var offset = Number(arg1) || 0;
-                var places = Number(arg2) || 0;
-                retval = function(v) { return((Number(v) + offset).toFixed(places)); };
-            } else if (name == "identity") {
-                var retval = function(v) {
-                    return((arg1)?v.toFixed(arg1):v);
-                }
-            } else if (name == "rudderPercent") {
-                var min = arg1;
-                var max = arg2;
-                retval = function(v) {
-                    return(((((v * 57.2958) / (max - min)) * 100) + 50));
-                }
-            } else if (name == "rudderAngle") {
-                var places = arg1 || 0;
-                retval = function(v) {
-                    return(Math.abs(v * 57.2958).toFixed(places));
-                }
-            } else if (name == "temperature") { // convert temperature from Kelvin to Centigrade
-                var factor = arg1 || 1;
-                var offset = arg2 || -273;
-                var places = arg3 || 1;
-                retval = function(v) {
-                    return(Number(((v + offset) * factor) / 10).toFixed(places));
-                }
-            } else if (name == "temperaturePercent") { // convert temperature to percentage
-                var min = Number(arg1) || 273;
-                var max = Number(arg2) || 313;
-                retval = function(v) {
-                    var r = Math.round(((Number(v) - min) / (max - min)) * 10);
-                    return((r < 0)?0:((r > 100)?100:r));
-                }
-            } else if (name == "loAlarm") {
-                var threshold = Number(arg1);
-                retval = function(v) {
-                    return(v < threshold);
-                }
-            }
-        }
-        return(retval);
-    } 
-
-
     /**
      * Returns a function that can be used to test if an update value falls
      * outside some thresholds specified by loalarm and hialarm.  Each of
@@ -356,20 +277,6 @@ class Widget {
             }
             return(retval);
         });
-    }
-
-    static degToDMS(deg, hemis) {  
-        var h = hemis[(deg >= 0)?0:1];
-        var d = Math.floor(deg);  
-        var minfloat = (deg - d) * 60;  
-        var m = Math.floor(minfloat);  
-        var secfloat = (minfloat - m) * 60;  
-        var s = Math.round(secfloat);  
-        var ds = Math.round((secfloat - s) * 10);
-      
-        if (s == 60) { m++; s=0; }  
-        if (m==60) { d++; m=0; }  
-        return ("" + ("00" + d).slice(-3) + '&deg;' + ("0" + m).slice(-2) + '\'' + ("0" + s).slice(-2) + '.' + ds + '"' + h);  
     }
 
 }
