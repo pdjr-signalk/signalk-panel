@@ -1,38 +1,8 @@
 @import 'theme';
 @import 'animations';
-html, body { height: 100%; }
-#overlay {
-    position:fixed;
-    top:0;
-    left:0;
-    background:rgba(0,0,0,0.8);
-    z-index:5;
-    width:100%;
-    height:100%;
-    display: none;
-    align-items: center;
-    justify-content: center;
-}
-#overlay-container {
-    display: table;
-    position:relative;
-    z-index: 10;
-}
-#overlay-chart {
-    width: 100vw;
-    min-width: 100vw;
-    height: 100vh;
-    min-height: 100vh;
-    position: relative;
-}
-#overlay-cancel {
-    width: 50px;
-    height: 50px;
-    position: absolute;
-    bottom: 0px;
-    left: 0px;
-    background: red;
-    z-index: 20;
+html, body {
+    height: 100%;
+    overflow: hidden;
 }
 .starboard::after {
     content: "&rarr;";
@@ -50,67 +20,10 @@ html, body { height: 100%; }
     @extend .theme-active-alert;
     color: red;
 }
-.widget-scroller-cell {
-    content-align: bottom;
-    position: relative;
+div[onclick]:hover {
+    @extend .w3-hover-theme;
 }
-.widget-scroller-bar {
-    position: absolute;
-    bottom: 0px;
-    width: 100%;
-    height: 100%;
-    border-top: khaki solid 1px;
-}
-.widget-bg-alarm {
-    animation: redflash 1s linear infinite;
-}
-.widget-digital {
-    position: relative;
-    z-index:2;
-}
-.widget-scroller {
-    position: absolute;
-    box-sizing: border-box;
-    top: 0px;
-    left: 0px;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-}
-.widget-indicator {
-    background-color: gray;
-    width: 10px;
-    height: 5px;
-}
-.widget-hgauge-label .widget-hgauge-grid {
-    position: relative;
-    box-sizing: border-box;
-    width: 100%;
-    height: 100%;
-}
-.widget-hgauge-label {
-    height: inherit;
-}
-.widget-hgauge-grid-tick {
-    position: absolute;
-    box-sizing: border-box;
-    left: 0px;
-    bottom: 0px;
-    border-right: gray solid 1px;
-    height: 5%;
-}
-.widget-hgauge-grid-tick::after {
-    opacity: 0.1;
-    content: attr(data-tick-value);
-    position: absolute;
-    transform: translate(-5px, -13px);
-}
-.relay .widget-indicator-on {
-    background-color: orange !important;
-}
-.switch .widget-indicator-on {
-    background-color: yellow !important;
-}
+
 .lcars-alarm {
     animation: redflash 1s linear infinite;
 }
@@ -141,26 +54,6 @@ html, body { height: 100%; }
     width: 100%;
     height: 100%;
     padding-top: 4px;
-    pointer-events: none;
-}
-.widget-hgauge-card {
-    @extend .theme-active;
-    position: absolute;
-    bottom: 0px;
-    left: 0px;
-    width: 100%;
-    height: 100%;
-    z-index: 1;
-    pointer-events: none;
-}
-.widget-hgauge-cursor {
-    position: absolute;
-    box-sizing: border-box;
-    bottom: 0px;
-    left: 0px;
-    width: 50%;
-    height: 100%;
-    border-right: 2px solid orange;
     pointer-events: none;
 }
 .lcars-vbar {

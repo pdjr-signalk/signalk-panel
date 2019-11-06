@@ -24,73 +24,6 @@ class SignalK {
 	}
 
     /**
-     * getValue asynchronously requests a Signal K path value.  The returned
-     * result is parsed to JSON, optionally filtered by an external function
-     * and returned to the client application via a callback.
-     *
-     * @param path - Signal K path to be interrogated.
-     * @param callback - client callback function.
-     * @param filter - optional filter function used to pre-process the value passed to callback.
-     */
-
-    getValue(path, callback, filter=this.getFilter("identity")) {
-        this.httpGetAsync("http://" + this.host + ":" + this.port + "/signalk/v1/api/vessels/self/" + path.replace(/\./g, "/"), (v) => {
-            v = JSON.parse(v);
-            v = ((typeof v === "object") && (v.value !== undefined))?v.value:v;
-            callback(filter(v));
-        });
-    }
-
-    /**
-     * interpolateValue is a convenience function which recover a Signal K
-     * value using getValue and interpolates the result directly into a
-     * specified DOM element.
-     *
-     * @param path - Signal K path to be interrogated.
-     * @param element - DOM element whose content will be overwritten.
-     * @param filter - optional filter function used to pre-process the recover path value before interpolation.
-     */
-
-    interpolateValue(path, element, filter=this.getFilter("identity")) {
-        getValue(path, function(v) { element.innerHTML = v; }, filter);
-    }
-
-    /**
-     * registerCallback subscribes a callback function so that it will be
-     * invoked each time a specified Signal K path value is updated. The delta
-     * values returned by the Signal K server are converted to JSON and
-     * optionally filters by an external function before being passed to the
-     * callback.
-     *
-     * @param path - Signal K path to be interrogated.
-     * @param callback - client callback function.
-     * @param filter - optional filter function used to pre-process delta values before they are passed to callback.
-     */
-    
-    registerCallback(path, callback, filter=this.getFilter("identity")) {
-        if (!this.directory[path]) this.directory[path] = [];
-        this.directory[path].push(function(v) {
-            v = JSON.parse(v);
-            v = ((typeof v === "object") && (v.value !== undefined))?v.value:v;
-            callback(filter(v));
-        });
-    }
-
-    /**
-     * registerInterpolation is a convenience function which subscribes for
-     * updates on a Signal K path and interpolates delta values directly into
-     * a specified DOM element.
-     *
-     * @param path - Signal K path to be interrogated.
-     * @param element - DOM element whose content will be overwritten.
-     * @param filter - optional filter function used to pre-process delta values before interpolation.
-     */
-
-    registerInterpolation(path, element, filter=this.getFilter("identity")) {
-        registerCallback(path, function(v) { element.innerHTML = v; }, filter);
-    }
-
-    /**
      * Insert Signal K data values into the DOM.
      *
      * <root> identifies the DOM sub-tree which should be processed.
@@ -156,7 +89,6 @@ class SignalK {
         });
     }
 
-
     /**
      * Process the DOM subtree identified by <root>, calling the <createWidget>
      * function for each element selected by <className>.  Selected elements
@@ -208,7 +140,6 @@ class SignalK {
         });
     }
 
-
 	subscribe() {
     	if ("WebSocket" in window) {
 		    console.log("SignalK: opening websocket connection to " + this.host + " on port " + this.port);
@@ -229,15 +160,15 @@ class SignalK {
         
 	        ws.onmessage = function(evt) {
             	var data = JSON.parse(evt.data);
-            	if ((data.updates !== undefined) && (data.updates.length > 0)) data.updates.forEach(update => {
-               		if ((update.values !== undefined) && (update.values.length > 0)) update.values.forEach(updateValue => {
-               			var path = updateValue.path;
-               			var value = updateValue.value;
+            	if ((data.updates !== undefined) && (data.updates.length > 0)) {
+               		if ((data.updates[0].values !== undefined) && (data.updates[0].values.length > 0)) {
+               			var path = data.updates[0].values[0].path;
+               			var value = data.updates[0].values[0].value;
                			if ((path !== undefined) && (value !== undefined)) directory[path].forEach(widget => {
                             widget.update(value);
                         });
-                    });
-               	});
+               		}
+            	}
     		}
         }
 	}

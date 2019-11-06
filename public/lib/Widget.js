@@ -27,11 +27,9 @@ class Widget {
         var retval = null, functions = [], func, card;
 
         if (options.range) {
-            var card = document.createElement("div"); card.className = "widget-vgauge-card";
-            //if ((options.scroller) && (func = makeScroller(card, options))) functions.push(func);
+            var card = document.createElement("div"); card.className = "widget-vgauge-card w3-theme-d1";
             //if ((options.grid) && (func = makeGrid(card, options.range.min, options.range.max, options.ticks))) functions.push(func);
             if ((options.cursor1) && (func = makeCursor(card, options.cursor1))) functions.push(func);
-            //if ((options.cursor2) && (func = makeCursor(card, options.cursor2))) functions.push(func);
             if ((options.label) && (func = makeGaugeLabel(card, options.label, innerHtml))) functions.push(func);
             parentNode.appendChild(card);
             retval = function(v) { functions.map(f => f(v)); }
@@ -57,7 +55,7 @@ class Widget {
             //console.log("makeGaugeLabel(%s,%s,%s)...", JSON.stringify(parentNode), JSON.stringify(options), innerHtml);
 
             var retval = null;
-            var label = document.createElement("div"); label.classList.add("widget-hgauge-label");
+            var label = document.createElement("div"); label.classList.add("widget-label");
             var found = innerHtml.match(/(.*)---(.*)/);
             var span = document.createElement("span"); span.innerHTML = "***";
             if (found.length >= 2) label.appendChild(document.createTextNode(found[1]));
@@ -171,7 +169,7 @@ class Widget {
     }
        
     static makeDigital(parentNode, options, innerHtml, ffunc) {
-        //console.log("Widget.makeDigital(%s, %s, %s)...", JSON.stringify(parentNode), JSON.stringify(options), innerHtml);
+        //console.log("Widget.makeDigital(%s, %s, %s)...", JSON.stringify(parentNode), JSON.stringify(options), JSON.stringify(innerHtml));
 
         var retval = null;
         var found = innerHtml.match(/(.*)---(.*)/);
@@ -190,18 +188,33 @@ class Widget {
     }
 
     static makeIndicator(parentNode, options, innerHtml, ffunc) {
-        //console.log("Widget.makeIndicator(%s,%s)...", JSON.stringify(parentNode), JSON.stringify(options));
+        //console.log("Widget.makeIndicator(%s,%s,%s)...", JSON.stringify(parentNode), JSON.stringify(options),JSON.stringify(innerHtml));
         var retval = null;
-        var div = document.createElement("div"); div.className = "widget-indicator";
-        parentNode.appendChild(div);
+        var className = (innerHtml.includes("---"))?"widget-notification":"widget-indicator";
+        var found = innerHtml.match(/(.*)---(.*)/);
+        var div = document.createElement("div");
+        var span = document.createElement("span"); 
+        var opton = options.on;
+        var optoff = options.off;
+        div.classList.add(className);
+        if ((found) && (found.length >= 2)) div.appendChild(document.createTextNode(found[1]));
+        div.appendChild(span);
+        if ((found) && (found.length >= 3)) div.appendChild(document.createTextNode(found[2]));
+        parentNode.appendChild(div); 
         if (options["function"]) {
             var fargs = options["function"].split(",");
             var func = ffunc(fargs[0], fargs.slice(1));
-            var states = options.state || { "on": "on", "off": "off" };
             if (func != null) retval = function(v) {
-                div.classList.remove(options.state.on);
-                div.classList.remove(options.state.off);
-                if (func(v) != 0) { div.classList.add(options.state.on); } else { div.classList.add(options.state.off); }
+                var r = func(v);
+                if (r) {
+                    span.innerHTML = (typeof r === "string")?r:((opton["value"] !== undefined)?opton["value"]:"");
+                    div.classList.remove(optoff["class"]);
+                    div.classList.add(opton["class"]);
+                } else {
+                    span.innerHTML = "";
+                    div.classList.remove(opton["class"]);
+                    div.classList.add(optoff["class"]);
+                }
             }
         }
         return(retval);

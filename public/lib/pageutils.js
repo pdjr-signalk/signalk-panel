@@ -52,7 +52,7 @@ class PageUtils {
 	            root.style.display = "flex";
                 var currentContentPath = containers[0].getAttribute("data-path") || "";
                 if (currentContentPath != path) {
-                    var content = httpGet(path);
+                    var content = PageUtils.httpGet(path);
                     if (content) {
                         containers[0].innerHTML = "";
                         containers[0].setAttribute("data-path", path);

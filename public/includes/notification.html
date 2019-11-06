@@ -1,10 +1,17 @@
 <div class="lcars-bar lcars-u-1 horizontal fill both-divider bottom">
-    <div id="T05" class="lcars-label">
-         <!--
-         data-source="signalk:notifications.switch.*"
-         data-widget-digital="filter:identity">
-         -->
-         ---
+    <div class="lcars-label">
+		<div class="widget"
+             data-source='{ "signalk": "electrical.switches.15.1.state" }'
+             data-params='{ "type": "indicator", "function": "identity", "on": { "class": "widget-indicator-on", "value": "WASTE DISCHARGE PUMP ACTIVE" }, "off": { "class": "widget-indicator-off", "value": "" } }' >
+        ---
+        </div>
+    </div>
+    <div class="lcars-label">
+		<div class="widget"
+             data-source='{ "signalk": "notifications.panel.tanks.freshWater.2.currentLevel" }'
+             data-params='{ "type": "indicator", "function": "notification,alert", "on": { "class": "widget-indicator-on" }, "off": { "class": "widget-indicator-off" } }' >
+        ---
+        </div>
     </div>
 </div>
 

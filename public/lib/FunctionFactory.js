@@ -1,13 +1,7 @@
 class FunctionFactory {
 
-    static createFunctionFactory() {
-        return(new FunctionFactory());
-    }
-
-    constructor() {
-    }
-    
     static getFilter(name, args) {
+        //console.log("FunctionFactory.getFilter(%s,%s)...", name, JSON.stringify(args));
         return((FunctionFactory.filters[name])?FunctionFactory.filters[name](args):FunctionFactory.filters["identity"](args));
     }
         
@@ -26,6 +20,16 @@ class FunctionFactory {
     }
 
     static filters = {
+
+        "notification":         function(args=[]) {
+                                    var level = (args.length > 0)?args[0]:"alert";
+                                    return(
+                                        function(v) {
+                                            console.log(JSON.stringify(v));
+                                            return((v.state == level)?v.message:null);
+                                        }
+                                    );
+                                },
 
         "identity":             function(args=[]) {
                                     return(
@@ -56,6 +60,10 @@ class FunctionFactory {
                                     var places = (args.length > 1)?args[1]:0;
                                     return(
                                         function(v) {
+                                            if (multiplier.startsWith('#')) {
+                                                var e = document.getElementById(multiplier.substring(1));
+                                                if (e) multiplier = e.textContent;
+                                            }
                                             return((v * multiplier).toFixed(places));
                                         }
                                     ); 
