@@ -1,16 +1,16 @@
 <div class="lcars-bar lcars-u-1-2 button"
      data-button='{ "function": "toggleOverlay", "params": { "overlay": "overlay-chart.html", "width": "100%", "height": "100%" } }'>
     <div class="lcars-text-box lcars-melrose-bg full-centered clickfree" style="position: relative;">
-        <div id="N02" class="widget lcars-label"
-             data-source='{ "signalk": "navigation.position" }'
-             data-params='{ "type": "digital", "function": "toLatitude" }'>
+        <div id="latitude" class="widget lcars-label"
+             data-signalk-path="navigation.position"
+             data-widget-options='{ "text": { "placeholder": "---", "function": { "name": "toLatitude" } } }'>
             ---
         </div>
     </div>
     <div class="lcars-text-box full-centered clickfree" style="position: relative;">
-        <div id="N03" class="widget lcars-label"
-             data-source='{ "signalk": "navigation.position" }'
-             data-params='{ "type": "digital", "function": "toLongitude" }'>
+        <div id="longitude" class="widget lcars-label"
+             data-signalk-path="navigation.position"
+             data-widget-options='{ "text": { "placeholder": "---", "function": { "name": "toLongitude" } } }'>
             ---
         </div>
     </div>

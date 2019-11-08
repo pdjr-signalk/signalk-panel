@@ -1,8 +1,8 @@
 <div class="lcars-bar lcars-u-1 horizontal both-divider button" style="position:relative;"
      data-button='{ "function": "toggleOverlay", "params": { "overlay": "overlay-sensorlog.html", "function": "displaySensorLog", "params": { "group": "acpower", "chart": "day" } } }'>
-    <div id="E04" class="widget lcars-label"
-         data-source='{ "signalk": "electrical.inverters.257.acout.power" }'
-         data-params='{ "type": "digital", "function": "multiplier,0.001,1" }'>
+    <div id="inverterpower" class="widget lcars-label"
+         data-signalk-path="electrical.inverters.257.acout.power"
+         data-widget-options='{ "text": { "function": { "name": "multiply", "factor": 0.001, "places": 1 } } }'>
         INV ---kW
     </div>
 </div>

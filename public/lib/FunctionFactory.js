@@ -1,8 +1,14 @@
 class FunctionFactory {
 
-    static getFilter(name, args) {
-        //console.log("FunctionFactory.getFilter(%s,%s)...", name, JSON.stringify(args));
-        return((FunctionFactory.filters[name])?FunctionFactory.filters[name](args):FunctionFactory.filters["identity"](args));
+    static getFilter(fspec = { "name": "identity" }) {
+        //console.log("FunctionFactory.getFilter(%s)...", JSON.stringify(fspec));
+        var retval = undefined;
+        try {
+            if (fspec.name) retval = FunctionFactory.filters[fspec.name](fspec);
+        } catch {
+            console.log("error parsing filter specification %s", fspec);
+        }
+        return(retval);    
     }
         
     static degToDMS(v, args={ "hemis": ["N", "S"] }) {  
@@ -21,8 +27,17 @@ class FunctionFactory {
 
     static filters = {
 
-        "notification":         function(args=[]) {
-                                    var level = (args.length > 0)?args[0]:"alert";
+        "getfield":             function(args={}) {
+                                    var fname = (args.fname)?args.fname:"value";
+                                    return(
+                                        function(v) {
+                                            return((typeof v === "object")?v[fname]:v);
+                                        }
+                                    );
+                                },
+
+        "notification":         function(args={}) {
+                                    var level = (args.level)?args.level:"alert";
                                     return(
                                         function(v) {
                                             console.log(JSON.stringify(v));
@@ -31,15 +46,21 @@ class FunctionFactory {
                                     );
                                 },
 
-        "identity":             function(args=[]) {
+        "identity":             function(args={}) {
+                                    var places = (args.places)?args.places:undefined;
+                                    var pad = (args.pad)?args.pad:undefined;
                                     return(
                                         function(v) {
+                                            if (typeof v === "number") {
+                                                if (places) v = v.toFixed(places);
+                                                if (pad) while (("" + v).length < pad) v = " " + v;
+                                            }
                                             return(v);
                                         }
                                     );
                                 },
 
-        "getDate":              function(args=[]) {
+        "getDate":              function(args={}) {
                                     return(
                                         function(v) {
                                             return(v.substr(0, v.indexOf('T')));
@@ -47,7 +68,7 @@ class FunctionFactory {
                                     ); 
                                 },
 
-        "getTime":              function(args=[]) {
+        "getTime":              function(args={}) {
                                     return(
                                         function(v) {
                                             return(v.substr(v.indexOf('T')+1));
@@ -55,23 +76,24 @@ class FunctionFactory {
                                     ); 
                                 },
 
-        "multiplier":           function(args=[]) {
-                                    var multiplier = (args.length > 0)?args[0]:1;
-                                    var places = (args.length > 1)?args[1]:0;
+        "multiply":             function(args={}) {
+                                    var factor = (args.factor)?args.factor:1;
+                                    var places = (args.places)?args.places:0;
                                     return(
                                         function(v) {
-                                            if (multiplier.startsWith('#')) {
-                                                var e = document.getElementById(multiplier.substring(1));
-                                                if (e) multiplier = e.textContent;
+                                            if ((typeof factor === "string") && factor.startsWith('#')) {
+                                                var e = document.getElementById(factor.substring(1));
+                                                if (e) factor = parseInt(e.textContent);
+                                                console.log("***************** " + factor);
                                             }
-                                            return((v * multiplier).toFixed(places));
+                                            return((v * factor).toFixed(places));
                                         }
                                     ); 
                                 },
  
-        "offset":               function(args=[]) {
-                                    var offset = (args.length > 0)?args[0]:0;
-                                    var places = (args.length > 1)?args[1]:0;
+        "offset":               function(args={}) {
+                                    var offset = (args.offset)?args.offset:0;
+                                    var places = (args.places)?args.places:0;
                                     return(
                                         function(v) {
                                             return((Number(v) + offset).toFixed(places));
@@ -79,10 +101,10 @@ class FunctionFactory {
                                     );
                                 },
 
-        "percent":              function(args=[]) {
-                                    var min = (args.length > 0)?args[0]:0;
-                                    var max = (args.length > 1)?args[1]:100;
-                                    var invert = ((args.length) && (args.invert == 1))?true:false;
+        "percent":              function(args={}) {
+                                    var min = (args.min)?args.min:0;
+                                    var max = (args.max)?args.max:100;
+                                    var invert = (args.invert)?args.invert:0;
                                     return(
                                         function(v) {
                                             v = Math.round((parseFloat(v) / (max - min)) * 100);
@@ -92,8 +114,8 @@ class FunctionFactory {
                                     );
                                 },
 
-        "rudderAngle":          function(args=[]) {
-                                    var places = (args.length > 0)?args[0]:0;
+        "rudderAngle":          function(args={}) {
+                                    var places = (args.places)?args.places:0;
                                     return(
                                         function(v) {
                                             return(Math.abs(v * 57.2958).toFixed(places));
@@ -101,9 +123,9 @@ class FunctionFactory {
                                     );
                                 },
 
-        "rudderPercent":        function(args=[]) {
-                                    var min = (args.length > 0)?args[0]:0;
-                                    var max = (args.length > 1)?args[1]:40;
+        "rudderPercent":        function(args={}) {
+                                    var min = (args.min)?args.min:0;
+                                    var max = (args.max)?args.max:40;
                                     return(
                                         function(v) {
                                             return((((v * 57.2958) / (max - min)) * 100) + 50);
@@ -111,10 +133,10 @@ class FunctionFactory {
                                     );
                                 },
 
-        "temperature":          function(args=[]) {
-                                    var factor = (args.length > 0)?args[0]:1;
-                                    var offset = (args.length > 1)?args[1]:-273;
-                                    var places = (args.length > 2)?args[2]:1;
+        "temperature":          function(args={}) {
+                                    var factor = (args.factor)?args.factor:1;
+                                    var offset = (args.offset)?args.offset:-273;
+                                    var places = (args.places)?args.places:1;
                                     return(
                                         function(v) {
                                             return(Number(((v + offset) * factor) / 10).toFixed(places));
@@ -122,7 +144,7 @@ class FunctionFactory {
                                     );
                                 },
 
-        "temperaturePercent":   function(args=[]) {
+        "temperaturePercent":   function(args={}) {
                                     var min = (args.length > 0)?args[0]:273;
                                     var max = (args.length > 1)?args[1]:313;
                                     return(
@@ -133,7 +155,7 @@ class FunctionFactory {
                                     );
                                 },
 
-        "toDegrees":            function(args=[]) {
+        "toDegrees":            function(args={}) {
                                     return(
                                         function(v) {
                                             return(("00" + (Math.round(v * 57.2958) % 360)).slice(-3));
@@ -141,7 +163,7 @@ class FunctionFactory {
                                     );
                                 },
 
-        "toLatitude":           function(args=[]) {
+        "toLatitude":           function(args={}) {
                                     return(
                                         function({ latitude, longitude }) {
                                             return(FunctionFactory.degToDMS(latitude, { "hemis": ['N','S'] })); 
@@ -149,7 +171,7 @@ class FunctionFactory {
                                     );
                                 },
 
-        "toLongitude":          function(args=[]) {
+        "toLongitude":          function(args={}) {
                                     return(
                                         function({ latitude, longitude }) {
                                             return(FunctionFactory.degToDMS(longitude, { "hemis": ['E','W'] })); 
@@ -157,8 +179,8 @@ class FunctionFactory {
                                     );
                                 },
 
-        "loAlarm":              function(args=[]) {
-                                    var threshold = (args.length > 0)?args[0]:1;
+        "loAlarm":              function(args={}) {
+                                    var threshold = (args.threshold)?args.threshold:1;
                                     return(
                                         function(v) {
                                             return(v < threshold);
@@ -166,8 +188,8 @@ class FunctionFactory {
                                     );
                                 }, 
 
-        "hiAlarm":              function(args=[]) {
-                                    var threshold = (args.length > 0)?args[0]:1;
+        "hiAlarm":              function(args={}) {
+                                    var threshold = (args.threshold)?args.threshold:1;
                                     return(
                                         function(v) {
                                             return(v > threshold);

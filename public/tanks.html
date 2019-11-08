@@ -4,62 +4,60 @@
 	    <script type="text/javascript" src="lib/pageutils.js"></script>
 	    <script type="text/javascript" src="lib/signalk.js"></script>
 	    <script type="text/javascript" src="lib/FunctionFactory.js"></script>
+	    <script type="text/javascript" src="lib/WidgetComponent.js"></script>
 	    <script type="text/javascript" src="lib/Widget.js"></script>
 	    <script type="text/javascript" src="lib/script.js"></script>
 	    <link rel="stylesheet" type="text/css" href="css/style.css">
         <title>Tank Levels</title>
-        <script>
-            function init() {
-                document.addEventListener("contextmenu", (e) => { contextHandler(e); e.preventDefault(); });
-                window.event.cancelBubble = true;
-                var signalk = new SignalK("192.168.1.1", 3000, FunctionFactory.getFilter, Widget.createWidget);
-                var pageutils = new PageUtils({ "overlayOnLoad": function(r) { signalk.registerWidgets(r, Widget.createWidget); }});
-                PageUtils.include(document);
-                signalk.interpolateValues(document);
-                signalk.registerWidgets(document);
-                signalk.subscribe();
+        <style type="text/css">
+            .widget-card {
+                background: darkgreen;
             }
-        </script>
+            .widget-cursor {
+                background: grey;
+                opacity: 0.6;
+            }
+        </style>
     </head>
     <body onload="init();">
         <div class="widget-table">
             <div class="widget-table-cell">
-                <div id="T3-CAPACITY" class="signalk" style="display: none;" data-source='{ "signalk": "tanks.fuel.3.capacity" }'></div>
+                <div id="T3-CAPACITY" class="signalk" style="display: none;" data-signalk-path="tanks.fuel.3.capacity" data-filter='{ "name": "getfield", "fname": "value" }'></div>
                 <div class="widget" style="height: 100%;" 
-                    data-source='{ "signalk": "tanks.fuel.3.currentLevel" }'
-                    data-params='{ "type": "vgauge", "range": { "min": 0, "max": 100 }, "label": { "function": "multiplier,#T3-CAPACITY,0" }, "cursor1": { "color": "white", "function": "percent,0,1" } }'>
+                    data-signalk-path="tanks.fuel.3.currentLevel"
+                    data-widget-options='{ "direction": "vertical", "text": { "placeholder": "---", "function": { "name": "multiply", "factor": "#T3-CAPACITY", "places": 0 }, "classes": "widget-bottom" }, "cursor": { "function": { "name": "percent", "min": 0, "max": 1 } } }'>
                     FUEL PS --- litres
                 </div>
             </div>
             <div class="widget-table-cell">
-                <div id="T4-CAPACITY" class="signalk" style="display: none;" data-source='{ "signalk": "tanks.fuel.4.capacity" }'></div>
+                <div id="T4-CAPACITY" class="signalk" style="display: none;" data-signalk-path="tanks.fuel.4.capacity" data-filter='{ "name": "getfield", "fname": "value" }'></div>
                 <div class="widget" style="height: 100%;" 
-                    data-source='{ "signalk": "tanks.fuel.4.currentLevel" }'
-                    data-params='{ "type": "vgauge", "range": { "min": 0, "max": 100 }, "label": { "function": "multiplier,#T4-CAPACITY,0" }, "cursor1": { "color": "red", "function": "percent,0,1" } }'>
+                    data-signalk-path="tanks.fuel.4.currentLevel"
+                    data-widget-options='{ "direction": "vertical", "text": { "placeholder": "---", "function": { "name": "multiply", "factor": "#T4-CAPACITY", "places": 0 } }, "cursor": { "function": { "name": "percent", "min": 0, "max": 1 } } }'>
                     FUEL SB --- litres
                 </div>
             </div>
             <div class="widget-table-cell">
-                <div id="T1-CAPACITY" class="signalk" style="display: none;" data-source='{ "signalk": "tanks.freshWater.1.capacity" }'></div>
+                <div id="T1-CAPACITY" class="signalk" style="display: none;" data-signalk-path="tanks.freshWater.1.capacity" data-filter='{ "name": "getfield", "fname": "value" }'></div>
                 <div class="widget" style="height: 100%;" 
-                    data-source='{ "signalk": "tanks.freshWater.1.currentLevel" }'
-                    data-params='{ "type": "vgauge", "range": { "min": 0, "max": 100 }, "label": { "function": "multiplier,#T1-CAPACITY,0" }, "cursor1": { "color": "blue", "function": "percent,0,1" } }'>
+                    data-signalk-path="tanks.freshWater.1.currentLevel"
+                    data-widget-options='{ "direction": "vertical", "text": { "placeholder": "---", "function": { "name": "multiply", "factor": "#T1-CAPACITY", "places": 0 } }, "cursor": { "function": { "name": "percent", "min": 0, "max": 1 } } }'>
                     WATER PS --- litres
                 </div>
             </div>
             <div class="widget-table-cell">
-                <div id="T2-CAPACITY" class="signalk" style="display: none;" data-source='{ "signalk": "tanks.freshWater.2.capacity" }'></div>
+                <div id="T2-CAPACITY" class="signalk" style="display: none;" data-signalk-path="tanks.freshWater.2.capacity" data-filter='{ "name": "getfield", "fname": "value" }'></div>
                 <div class="widget" style="height: 100%;" 
-                    data-source='{ "signalk": "tanks.freshWater.2.currentLevel" }'
-                    data-params='{ "type": "vgauge", "range": { "min": 0, "max": 100 }, "label": { "function": "multiplier,#T2-CAPACITY,0" }, "cursor1": { "color": "blue", "function": "percent,0,1" } }'>
+                    data-signalk-path="tanks.freshWater.2.currentLevel"
+                    data-widget-options='{ "direction": "vertical", "text": { "placeholder": "---", "function": { "name": "multiply", "factor": "#T2-CAPACITY", "places": 0 } }, "cursor": { "function": { "name": "percent", "min": 0, "max": 1 } } }'>
                     WATER SB --- litres
                 </div>
             </div>
             <div class="widget-table-cell">
-                <div id="T0-CAPACITY" class="signalk" style="display: none;" data-source='{ "signalk": "tanks.wasteWater.0.capacity" }'></div>
+                <div id="T0-CAPACITY" class="signalk" style="display: none;" data-signalk-path="tanks.wasteWater.0.capacity" data-filter='{ "name": "getfield", "fname": "value" }'></div>
                 <div class="widget" style="height: 100%;" 
-                    data-source='{ "signalk": "tanks.wasteWater.0.currentLevel" }'
-                    data-params='{ "type": "vgauge", "range": { "min": 0, "max": 100 }, "label": { "function": "multiplier,#T0-CAPACITY,0" }, "cursor1": { "color": "grey", "function": "percent,0,1" } }'>
+                    data-signalk-path="tanks.wasteWater.0.currentLevel"
+                    data-widget-options='{ "direction": "vertical", "text": { "placeholder": "---", "function": { "name": "multiply", "factor": "#T0-CAPACITY", "places": 0 } }, "cursor": { "function": { "name": "percent", "min": 0, "max": 1 } } }'>
                     WASTE --- litres
                 </div>
             </div>

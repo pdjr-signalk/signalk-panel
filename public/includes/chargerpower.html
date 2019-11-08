@@ -1,9 +1,9 @@
 <!-- BATTERY CHARGER POWER -->
 <div class="lcars-bar lcars-u-1 horizontal both-divider button" style="position:relative;"
      data-button='{ "function": "toggleOverlay", "params": { "overlay": "overlay-sensorlog.html", "function": "displaySensorLog", "params": { "group": "acpower", "chart": "day" } } }'>
-    <div id="E04" class="widget lcars-label"
-         data-source='{ "signalk": "electrical.chargers.257.power" }'
-         data-params='{ "type": "digital", "function": "multiplier,0.001,1" }'>
+    <div id="chargerpower" class="widget lcars-label"
+         data-signalk-path='electrical.chargers.257.power'
+         data-widget-options='{ "text": { "placeholder": "---", "function": { "name": "multiply", "factor": 0.001, "places": 1 } } }'>
         BAT ---kW
     </div>
 </div>

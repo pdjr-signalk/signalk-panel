@@ -16,6 +16,7 @@
     table-layout: fixed;
     width: 100%;
     height: 98vh;
+
 }
 .widget-table-cell {
     display: table-cell;
@@ -55,25 +56,52 @@
     height: 300px;
 }
 
-.widget-vgauge-card {
-    height: 100%;
+.widget-card {
+  position: absolute;
+  bottom: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  font-weight: bold;
+  text-align: center;
+  pointer-events: none;
+}
+/*
+.widget-card:before {
+  content: '';
+  display: inline-block;
+  height: 100%;
+  vertical-align: middle;
+  margin-right: -0.25em;
+}
+*/
+
+.widget-text {
+    display: table;
     width: 100%;
-    position: relative;
-    font-weight: bold;
+    height: 100%;
+    vertical-align: middle;
+}
+.widget-text-cell {
+    display: table-cell;
+    width: 100%;
     text-align: center;
+    vertical-align: middle;
+}
+.widget-text.widget-bottom {
+    display: table;
+    width: 100%;
+    height: 100%;
+    vertical-align: middle;
 }
 
-.widget-vgauge-card span::before {
+/*
+.widget-text-cell span::before {
     content: "\A";
     white-space: pre-line;
 }
-
-.widget-vgauge-cursor {
-    width: 90%;
-    position: absolute;
-    bottom: 0;
-    left: 5%;
-}
+*/
 
 #overlay {
   position: fixed;
@@ -181,21 +209,23 @@
 .switch .widget-indicator-on {
   background-color: yellow !important; }
 
-.widget-hgauge-card {
-  position: absolute;
-  bottom: 0px;
-  left: 0px;
-  width: 100%;
-  height: 100%;
-  z-index: 1;
-  pointer-events: none; }
 
-.widget-hgauge-cursor {
-  position: absolute;
-  box-sizing: border-box;
-  bottom: 0px;
-  left: 0px;
-  width: 50%;
-  height: 100%;
-  border-right: 2px solid orange;
-  pointer-events: none; }
+.widget-cursor {
+    position: absolute;
+    pointer-events: none;
+    box-sizing: border-box;
+}
+
+.widget-cursor.widget-vertical {
+    bottom: 0;
+    left: 5%;
+    width: 90%;
+}
+
+.widget-cursor.widget-horizontal {
+    bottom: 0px;
+    left: 0px;
+    width: 50%;
+    height: 100%;
+    border-right: 2px solid orange;
+}

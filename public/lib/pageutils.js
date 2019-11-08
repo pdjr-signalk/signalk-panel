@@ -4,6 +4,35 @@ class PageUtils {
         PageUtils.overlayOnLoad = (options.overlayOnLoad)?options.overlayOnLoad:null;
 	}
 
+    static getAttributeValue(element, name, subname) {
+        //console.log("getAttributeValue(%s,%s,%s)...", JSON.stringify(element), name, subname);
+        var retval = undefined;
+        if (element.hasAttribute(name)) {
+            var value = element.getAttribute(name);
+            try {
+                retval = JSON.parse(value);
+                if ((subname) && (retval[subname])) retval = retval[subname];
+            } catch(e) {
+                retval = value;
+            }
+        }
+        return(retval);
+    }
+
+    static walk(root, classname, callback) {
+        var elements = root.getElementsByClassName(classname);
+        [...elements].forEach(element => {
+            callback(element);
+        });
+    }
+
+    static wildWalk(root, classnameRegex, callback) {
+        var elements = root.getElementsByTagName('div');
+        var regex = RegExp(classnameRegex);
+        [...elements].forEach(element => {
+            if (element.className.includes(classnameRegex)) callback(element);
+        });
+    }
 
 	/**
 	 * include - searches a DOM sub-tree identifying DIVs which contain
