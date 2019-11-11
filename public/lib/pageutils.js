@@ -2,6 +2,7 @@ class PageUtils {
 
 	constructor(options) {
         PageUtils.overlayOnLoad = (options.overlayOnLoad)?options.overlayOnLoad:null;
+        PageUtils.overlayObject = undefined;
 	}
 
     static getAttributeValue(element, name, subname) {
@@ -74,32 +75,44 @@ class PageUtils {
 		});
 	}
 
-    static openOverlay(root, path) {
-	    if (root != null) {
-            var containers = root.getElementsByClassName("overlay-container");
-            if (containers.length > 0) {
-	            root.style.display = "flex";
-                var currentContentPath = containers[0].getAttribute("data-path") || "";
-                if (currentContentPath != path) {
-                    var content = PageUtils.httpGet(path);
-                    if (content) {
-                        containers[0].innerHTML = "";
-                        containers[0].setAttribute("data-path", path);
-                        containers[0].innerHTML = content;
-                    }
-                    var titles = document.querySelectorAll('[data-overlay-title]');
-                    var title = (titles.length > 0)?titles[0].getAttribute("data-overlay-title"):"***";
-                    var span = document.getElementById('overlay-title');
-                    while (span.firstChild) span.removeChild(span.firstChild );
-                    span.appendChild(document.createTextNode(title));
-                    if (this.overlayOnLoad) this.overlayOnLoad(root);
+    static openOverlay(source) {
+        //console.log("openOverlay(%s)...", source);
+
+        PageUtils.overlayObject = undefined;
+
+        var overlay = document.getElementById("overlay");
+        if (overlay) {
+            overlay.style.display = "flex";
+            var container = document.getElementById("overlay-container");
+            if (container) {
+                while (container.firstChild) container.removeChild(container.firstChild );
+                //container.innerHtml = "";
+                if (typeof source === "function") {
+                    PageUtils.overlayObject = source();
+                    container.appendChild(PageUtils.overlayObject.getTree());
+                } else {
+                    container.innerHTML = PageUtils.httpGet(source);
                 }
+                var titles = document.querySelectorAll('[data-overlay-title]');
+                var title = (titles.length > 0)?titles[0].getAttribute("data-overlay-title"):"***";
+                var span = document.getElementById('overlay-title');
+                while (span.firstChild) span.removeChild(span.firstChild );
+                span.appendChild(document.createTextNode(title));
+
+                //if (this.overlayOnLoad) this.overlayOnLoad(root);
             }
         }
     }
 
+    static gotOverlay(container, content) {
+        container.innerHTML = content;
+    }
+
     static closeOverlay(root) {
         if (root != null) {
+            if ((PageUtils.overlayObject) && (typeof PageUtils.overlayObject.onClose === "function")) {
+                PageUtils.overlayObject.onClose();
+            }
             root.style.display = "none";
         }
     }
@@ -126,6 +139,8 @@ class PageUtils {
     }
 
     static httpGet(theUrl) {
+        //console.log("httpGet(%s)...", theUrl);
+
         var xmlHttp = new XMLHttpRequest();
         xmlHttp.open( "GET", theUrl, false ); // false for synchronous request
         xmlHttp.send( null );

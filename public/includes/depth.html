@@ -1,16 +1,21 @@
-<div id="log" class="lcars-row">
+<div id="depth" class="lcars-row">
     <div class="lcars-element left-rounded lcars-u-1-1">
-        <div class="widget lcars-element-addition"
+        <div id="depth-text" class="widget lcars-element-addition"
             data-signalk-path="environment.depth.belowTransducer"
             data-widget-options='{ "text": { "placeholder": "---", "function": { "name": "identity", "places": 1 } } }'>
             ---
         </div>
     </div>
     <div class="lcars-element lcars-u-4">
-        <div class="widget relative"
-            data-signalk-path="signalk": "environment.depth.belowTransducer"
+        <div id="depth-gauge" class="widget"
+            data-signalk-path="environment.depth.belowTransducer"
             data-widget-options='{ "direction": "horizontal", "scale": { "min":0, "max":5, "ticks": 10 }, "cursor": { "function": { "name": "percent", "min": 0, "max": 5 } } }'>
         </div>
     </div>
-    <div class="lcars-element right-rounded lcars-u-1 button">Depth / m</div>
+    <div id="depth-alert"
+         class="lcars-element right-rounded lcars-u-1-1 widget"
+         data-signalk-path="environment.depth.belowTransducer"
+         data-widget-options='{ "alert": { "function": { "name": "test", "test": "!depth-alert-test", "threshold": "!depth-alert-threshold", "disabled": 0 } } }'>
+        Depth / m
+    </div>
 </div>

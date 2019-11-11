@@ -1,32 +1,30 @@
 class Widget {
 
-    constructor(parentNode, widgetOptions, widgetComponentCreateFunction, getFilterFunction) {
-        console.log("Widget(%s,%s)...", parentNode, JSON.stringify(widgetOptions)); 
+    constructor(parentNode, widgetOptions, createWidgetComponent, getFilterFunction) {
+        //console.log("Widget(%s,%s)...", parentNode, JSON.stringify(widgetOptions)); 
 
         this.parentNode = parentNode;
-        this.innerHtml = parentNode.innerHTML.trim();
-        this.widgetComponentCreateFunction = widgetComponentCreateFunction;
-        this.timestamp = undefined;
-        this.latest = undefined;
+        this.widgetOptions = widgetOptions;
+        this.createWidgetComponent = createWidgetComponent;
+        this.getFilterFunction = getFilterFunction;
+
         this.components = [];
-        this.card = undefined;
 
-        this.parentNode.innerHTML = "";
-        this.card = document.createElement("div"); 
-        this.card.className = "widget-card";
-
-        console.log(">>>>>>>> " + JSON.stringify(Object.keys(widgetOptions)));
         for (var componentName of Object.keys(widgetOptions)) {
-            var component = widgetComponentCreateFunction(componentName, this.innerHtml, widgetOptions, getFilterFunction);
-            if (component != undefined) {
-                this.card.appendChild(component.getTree());
-                this.components.push(component);
-            }
+            var component = createWidgetComponent(componentName, parentNode, widgetOptions, getFilterFunction);
+            if (component) this.components.push(component);
         }
 
-        this.parentNode.appendChild(this.card);
+        if (this.components.reduce((a,c) => ((c.getTree() !== undefined) || a), false)) {
+            var card = document.createElement("div");
+            card.className = "widget-card";
+            this.components.filter(component => (component.getTree() !== undefined)).forEach(component => {
+                card.appendChild(component.getTree());
+            });
+            this.parentNode.innerHTML = "";
+            this.parentNode.appendChild(card);
+        }
     }
-
 
     update(value) {
         //console.log("Widget.update(%s)...", JSON.stringify(value));
@@ -37,4 +35,3 @@ class Widget {
     }
 
 }
-

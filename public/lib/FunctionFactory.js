@@ -25,7 +25,41 @@ class FunctionFactory {
         return ("" + ("00" + d).slice(-3) + '&deg;' + ("0" + m).slice(-2) + '\'' + ("0" + s).slice(-2) + '.' + ds + '"' + h);  
     }
 
+    static decodeValue(v, parser) {
+        if (typeof v == "string") {
+            switch (v.charAt(0)) {
+                case '#': v = document.getElementById(v.substr(1)).innerHTML;
+                    break;
+                case '!': v = window.localStorage.getItem(v.substr(1));
+                    break;
+                default:
+                    break;
+            }
+        }
+        return((parser)?parser(v):v);
+    }
+
+
     static filters = {
+
+        "test":                 function(args={}) {
+                                    var test = (args.test)?args.test:"eq";
+                                    var threshold = (args.threshold)?args.threshold:0;
+                                    return(
+                                        function(v) {
+                                            v = parseFloat("" + v);
+                                            var _test = FunctionFactory.decodeValue(test);
+                                            var _threshold = FunctionFactory.decodeValue(threshold, parseFloat);
+                                            switch (_test) {
+                                                case "eq": return(v == _threshold); break;
+                                                case "lt": return(v < _threshold); break;
+                                                case "gt": return(v > _threshold); break;
+                                                default: break;
+                                            }
+                                            return(false);
+                                        }
+                                    );
+                                },
 
         "getfield":             function(args={}) {
                                     var fname = (args.fname)?args.fname:"value";
