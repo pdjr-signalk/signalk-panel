@@ -32,6 +32,8 @@ class WidgetComponent {
         this.parentNode = parentNode;
         this.tree = undefined;
         this.updateFunction = undefined;
+
+        
     }
 
     getTree() {
@@ -43,10 +45,26 @@ class WidgetComponent {
     }
 
     initialiseLocalStorage(name, defaultValue) {
+        //console.log("initialiseLocalStorage(%s,%s)...", name, defaultValue);
         if (window.localStorage.getItem(name) == undefined) window.localStorage.setItem(name, defaultValue);
         if (window.localStorage.getItem(name) == undefined) throw("error processing session storage item '" + name + "'");
         return;
     }
+
+    resolveValue(name, args, fallback) {
+        //console.log("resolveValue(%s,%s,%s)...", name, JSON.stringify(args), fallback);
+
+        var retval = fallback;
+        var key = Object.keys(args).reduce((a,v) => { return((v.includes("!" + name))?v:a); }, undefined);
+
+        if (key) {
+            retval = PageUtils.getStorageItem(key, args[key]);
+        } else {
+            retval = args[name];
+        }
+        return(retval);
+    }
+            
 
 }
 
@@ -58,9 +76,9 @@ class AlertComponent extends WidgetComponent {
         super(parentNode, widgetOptions, getFilterFunction);
 
         try {
-            super.initialiseLocalStorage(parentNode.id + "-test", widgetOptions["alert"]["test"]);
-            super.initialiseLocalStorage(parentNode.id + "-threshold", widgetOptions["alert"]["threshold"]);
-            super.initialiseLocalStorage(parentNode.id + "-disabled", widgetOptions["alert"]["disabled"]);
+            super.initialiseLocalStorage(parentNode.id + "-test", widgetOptions["alert"]["defaults"]["test"]);
+            super.initialiseLocalStorage(parentNode.id + "-threshold", widgetOptions["alert"]["defaults"]["threshold"]);
+            super.initialiseLocalStorage(parentNode.id + "-disabled", widgetOptions["alert"]["defaults"]["disabled"]);
 
             // Update parentNode class membership
             //
@@ -99,7 +117,6 @@ class AlertComponent extends WidgetComponent {
                     }
                 }
             }
-            console.log(e);
         } catch(e) {
         }
     }
@@ -109,16 +126,25 @@ class AlertComponent extends WidgetComponent {
 class ScaleComponent extends WidgetComponent {
 
     constructor(parentNode, widgetOptions, getFilterFunction) {
-        //console.log("ScaleComponent(%s,%s)...", parentNode, JSON.stringify(widgetOptions));
+        console.log("ScaleComponent(%s,%s)...", parentNode, JSON.stringify(widgetOptions));
 
         super(parentNode, widgetOptions, getFilterFunction);
 
         var direction = (widgetOptions.direction)?widgetOptions.direction:"horizontal";
-
-        var min = (widgetOptions.scale.min)?widgetOptions.scale.min:0;
-        var max = (widgetOptions.scale.max)?widgetOptions.scale.max:100;
-        var ticks = (widgetOptions.scale.ticks)?widgetOptions.scale.ticks:10;
-
+        var selector = super.resolveValue("selector", widgetOptions.scale);
+        var settings = widgetOptions.scale.settings;
+        if ((settings !== undefined) && (selector !== undefined)) {
+            var scale = PageUtils.getStorageItem(selector);
+            if ((scale !== undefined) && (settings[scale] !== undefined)) {
+                var [min,max,ticks] = settings[scale];
+                PageUtils.setStorageItem(selector.split("!")[0] + "!scale-min", min);
+                PageUtils.setStorageItem(selector.split("!")[0] + "!scale-max", max);
+            } else {
+                console.log("ignoring malformed definition for ScaleComponent");
+            }
+        } else {
+            console.log("ScaleComponent: configuration error (required attributes are missing)");
+        }
 
         var div = document.createElement("div");
         div.className = "widget-component widget-scale" + ((direction == "horizontal")?" widget-horizontal":" widget-vertical");

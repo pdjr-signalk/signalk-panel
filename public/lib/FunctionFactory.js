@@ -2,15 +2,19 @@ class FunctionFactory {
 
     static getFilter(fspec = { "name": "identity" }) {
         //console.log("FunctionFactory.getFilter(%s)...", JSON.stringify(fspec));
+
         var retval = undefined;
+        
         try {
-            if (fspec.name) retval = FunctionFactory.filters[fspec.name](fspec);
+            if (fspec["name"]) {
+                retval = FunctionFactory.filters[fspec.name](fspec);
+            }
         } catch {
             console.log("error parsing filter specification %s", fspec);
         }
         return(retval);    
     }
-        
+
     static degToDMS(v, args={ "hemis": ["N", "S"] }) {  
         var h = args["hemis"][(v >= 0)?0:1];
         var d = Math.floor(v);  
@@ -25,38 +29,158 @@ class FunctionFactory {
         return ("" + ("00" + d).slice(-3) + '&deg;' + ("0" + m).slice(-2) + '\'' + ("0" + s).slice(-2) + '.' + ds + '"' + h);  
     }
 
-    static decodeValue(v, parser) {
-        if (typeof v == "string") {
-            switch (v.charAt(0)) {
-                case '#': v = document.getElementById(v.substr(1)).innerHTML;
-                    break;
-                case '!': v = window.localStorage.getItem(v.substr(1));
-                    break;
-                default:
-                    break;
+    static resolveValues(args) {
+        var values = {};
+        Object.keys(args).filter(name => (name != "name")).forEach(name => {
+            if (!name.includes("!")) {
+                var value = args[name];
+                if (value !== undefined) value = (("" + value).includes("!"))?PageUtils.getStorageItem(value):value;
+                values[name] = value;
+            } else {
+                var nameparts = name.split("!");
+                values[nameparts[1]] = PageUtils.getStorageItem(name, args[name]);
             }
-        }
-        return((parser)?parser(v):v);
+        });
+        return(values);
     }
+        
+        
 
 
     static filters = {
 
-        "test":                 function(args={}) {
-                                    var test = (args.test)?args.test:"eq";
-                                    var threshold = (args.threshold)?args.threshold:0;
+        "sog":                  function(args={}) {
+                                    var args = args;
                                     return(
                                         function(v) {
-                                            v = parseFloat("" + v);
-                                            var _test = FunctionFactory.decodeValue(test);
-                                            var _threshold = FunctionFactory.decodeValue(threshold, parseFloat);
-                                            switch (_test) {
-                                                case "eq": return(v == _threshold); break;
-                                                case "lt": return(v < _threshold); break;
-                                                case "gt": return(v > _threshold); break;
+                                            var v = parseFloat(v);
+                                            var _args = FunctionFactory.resolveValues(args);
+                                            var retval = v;
+                                            switch (_args.units) {
+                                                case "kts": retval = (v * 0.539957); break;
+                                                case "mph": retval = (v * 0.621371); break;
+                                                case "mps": retval = (v * 0.277778); break;
                                                 default: break;
                                             }
-                                            return(false);
+                                            return(retval.toFixed(parseInt(_args.places)));
+                                        }
+                                    );
+                                },
+
+        "depth":                function(args={}) {
+                                    var args = args;
+                                    return(
+                                        function(v) {
+                                            var v = parseFloat(v);
+                                            var _args = FunctionFactory.resolveValues(args);
+                                            var units = _args.units;
+                                            var places = parseInt(_args.places);
+                                            var retval = v;
+                                            switch (units) {
+                                                case "ft": retval = (v * 3.28084); break;
+                                                case "ftm": retval = (v * 0.546807); break;
+                                                default: break;
+                                            }
+                                            return((Math.round(retval * (10 * places)) / (10 * places)).toFixed(places));
+                                        }
+                                    );
+                                },
+
+        "percent":              function(args={}) {
+                                    var args = args;
+                                    return(
+                                        function(v) {
+                                            var v = parseFloat(v);
+                                            var _args = FunctionFactory.resolveValues(args);
+                                            var min = parseFloat(_args.min);
+                                            var max = parseFloat(_args.max);
+                                            var invert = parseInt(_args.invert);
+                                            var retval = v;
+                                            retval = Math.round((v / (max - min)) * 100);
+                                            retval = (retval < 0)?0:((retval > 100)?100:retval); 
+                                            return((args.invert)?(100 - retval):retval); 
+                                        }
+                                    );
+                                },
+
+        "rateOfTurn":           function(args={}) {
+                                    var args = args;
+                                    return(
+                                        function(v) {
+                                            var v = parseFloat(v);
+                                            var _args = FunctionFactory.resolveValues(args);
+                                            var retval = parseFloat(v);
+                                            return((Math.abs(v * 57.2958) * 60).toFixed(parseInt(_args.places)));
+                                        }
+                                    );
+                                },
+
+        "rateOfTurnPercent":    function(args={}) {
+                                    var args = args;
+                                    return(
+                                        function(v) {
+                                            var v = parseFloat(v);
+                                            var _args = FunctionFactory.resolveValues(args);
+                                            return(Math.round((((v * 57.2958 * 60) / (parseFloat(_args.max) - parseFloat(_args.min))) * 100) + 50));
+                                        }
+                                    );
+                                },
+
+        "rudderAngle":          function(args={}) {
+                                    var args = args;
+                                    return(
+                                        function(v) {
+                                            var v = parseFloat(v);
+                                            var _args = FunctionFactory.resolveValues(args);
+                                            return(Math.abs(v * 57.2958).toFixed(parseInt(_args.places)));
+                                        }
+                                    );
+                                },
+
+        "rudderPercent":        function(args={}) {
+                                    var args = args;
+                                    return(
+                                        function(v) {
+                                            var v = parseFloat(v);
+                                            var _args = FunctionFactory.resolveValues(args);
+                                            return((((v * 57.2958) / (parseFloat(_args.max) - parseFloat(_args.min))) * 100) + 50);
+                                        }
+                                    );
+                                },
+
+        "test":                 function(args={}) {
+                                    var args = args;
+                                    return(
+                                        function(v) {
+                                            v = parseFloat(v);
+                                            var retval = false;
+                                            var _args = FunctionFactory.resolveValues(args);
+                                            var threshold = parseFloat(_args.threshold);
+                                            switch (_args.test) {
+                                                case "eq": retval = (v == threshold); break;
+                                                case "lt": retval = (v < threshold); break;
+                                                case "gt": retval = (v > threshold); break;
+                                                default: break;
+                                            }
+                                            return(retval);
+                                        }
+                                    );
+                                },
+
+        "temperature":          function(args={}) {
+                                    var args = args;
+                                    return(
+                                        function(v) {
+                                            v = parseFloat(v);
+                                            var _args = FunctionFactory.resolveValues(args);
+                                            var units = _args.units;
+                                            var places = _args.places;
+                                            switch (units) {
+                                                case "C": retval = ((v -273) / 10); break;
+                                                case "K": retval = (v / 10); break;
+                                                default: retval = v; break;
+                                            }
+                                            return(retval.toFixed(places));
                                         }
                                     );
                                 },
@@ -118,7 +242,6 @@ class FunctionFactory {
                                             if ((typeof factor === "string") && factor.startsWith('#')) {
                                                 var e = document.getElementById(factor.substring(1));
                                                 if (e) factor = parseInt(e.textContent);
-                                                console.log("***************** " + factor);
                                             }
                                             return((v * factor).toFixed(places));
                                         }
@@ -135,48 +258,6 @@ class FunctionFactory {
                                     );
                                 },
 
-        "percent":              function(args={}) {
-                                    var min = (args.min)?args.min:0;
-                                    var max = (args.max)?args.max:100;
-                                    var invert = (args.invert)?args.invert:0;
-                                    return(
-                                        function(v) {
-                                            v = Math.round((parseFloat(v) / (max - min)) * 100);
-                                            v = (v < 0)?0:((v > 100)?100:v); 
-                                            return((invert)?(100 - v):v); 
-                                        }
-                                    );
-                                },
-
-        "rudderAngle":          function(args={}) {
-                                    var places = (args.places)?args.places:0;
-                                    return(
-                                        function(v) {
-                                            return(Math.abs(v * 57.2958).toFixed(places));
-                                        }
-                                    );
-                                },
-
-        "rudderPercent":        function(args={}) {
-                                    var min = (args.min)?args.min:0;
-                                    var max = (args.max)?args.max:40;
-                                    return(
-                                        function(v) {
-                                            return((((v * 57.2958) / (max - min)) * 100) + 50);
-                                        }
-                                    );
-                                },
-
-        "temperature":          function(args={}) {
-                                    var factor = (args.factor)?args.factor:1;
-                                    var offset = (args.offset)?args.offset:-273;
-                                    var places = (args.places)?args.places:1;
-                                    return(
-                                        function(v) {
-                                            return(Number(((v + offset) * factor) / 10).toFixed(places));
-                                        }
-                                    );
-                                },
 
         "temperaturePercent":   function(args={}) {
                                     var min = (args.length > 0)?args[0]:273;

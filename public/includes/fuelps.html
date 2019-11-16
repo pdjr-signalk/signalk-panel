@@ -1,4 +1,12 @@
-<div class="lcars-bar lcars-u-1 horizontal both-divider bottom button" onClick="PageUtils.openOverlay('overlay-tanks.html')">
+<div class="lcars-bar lcars-u-1 horizontal both-divider bottom button"
+     onClick="Overlay.createOverlay([
+            'includes/overlays/tank/gauges.html',
+            'includes/overlays/tank/history-hour.html',
+            'includes/overlays/tank/history-day.html',
+            'includes/overlays/tank/history-week.html',
+            'includes/overlays/tank/history-month.html',
+            'includes/overlays/tank/history-year.html',
+     ])">
     <div id="T05" class="widget lcars-label"
          data-signalk-path="tanks.fuel.3.currentLevel"
          data-widget-options='{ "direction": "horizontal", "text": { "placeholder": "---", "function": { "name": "percent", "min": 0, "max": 1 } }, "cursor": { "function": { "name": "percent", "min": 0, "max":1 } } }'>

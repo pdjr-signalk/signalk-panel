@@ -1,21 +1,20 @@
-<div id="depth" class="lcars-row">
+<div class="lcars-row">
     <div class="lcars-element left-rounded lcars-u-1-1">
-        <div id="depth-text" class="widget lcars-element-addition"
+        <div class="lcars-element-addition widget"
             data-signalk-path="environment.depth.belowTransducer"
-            data-widget-options='{ "text": { "placeholder": "---", "function": { "name": "identity", "places": 1 } } }'>
+            data-widget-options='{ "text": { "function": { "name": "depth", "depth!units": "m", "depth!places": 1 } } }'>
             ---
         </div>
     </div>
     <div class="lcars-element lcars-u-4">
-        <div id="depth-gauge" class="widget"
+        <div class="widget"
             data-signalk-path="environment.depth.belowTransducer"
-            data-widget-options='{ "direction": "horizontal", "scale": { "min":0, "max":5, "ticks": 10 }, "cursor": { "function": { "name": "percent", "min": 0, "max": 5 } } }'>
+            data-widget-options='{ "scale": { "selector": "depth!units", "settings": { "m": [0,5,10] } }, "cursor": { "function": { "name": "percent", "min": "depth!scale-min", "max": "depth!scale-max" } } }'>
         </div>
     </div>
-    <div id="depth-alert"
-         class="lcars-element right-rounded lcars-u-1-1 widget"
+    <div id="depth-alert" class="lcars-element right-rounded lcars-u-1-1 widget"
          data-signalk-path="environment.depth.belowTransducer"
-         data-widget-options='{ "alert": { "function": { "name": "test", "test": "!depth-alert-test", "threshold": "!depth-alert-threshold", "disabled": 0 } } }'>
-        Depth / m
+         data-widget-options='{ "alert": { "function": { "name": "test", "depth!alert-test": "lt": "depth!alert-threshold": 2 }, "disabled": 0 } }'>
+        Depth /&nbsp;<span class="storageitem depth!units"></span>
     </div>
 </div>

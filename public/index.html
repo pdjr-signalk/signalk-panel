@@ -4,6 +4,7 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<script type="text/javascript" src="lib/drag.js"></script>
 	<script type="text/javascript" src="lib/FunctionFactory.js"></script>
+	<script type="text/javascript" src="lib/Overlay.js"></script>
 	<script type="text/javascript" src="lib/Widget.js"></script>
 	<script type="text/javascript" src="lib/WidgetComponent.js"></script>
 	<script type="text/javascript" src="lib/AlertEditor.js"></script>
@@ -45,7 +46,7 @@
             <div class="lcars-bar horizontal">
                 <div class="signalk lcars-title right" data-signalk-path="name"></div>
             </div>
-            <div class="lcars-bar horizontal right-end decorated" onClick="PageUtils.openOverlay(AlertEditor.createAlertEditor)">
+            <div class="lcars-bar horizontal right-end decorated" onClick="Overlay.createOverlay(AlertEditor.createAlertEditor)">
             </div>
         </div>
 
@@ -86,7 +87,9 @@
         <div id="container" style="overflow: hidden;">
             <!-- COLUMN LAYOUT -->
             <div class="lcars-column">
-                <div data-include="includes/log.html"></div>
+                <div data-include="includes/sog.html"></div>
+                <div class="lcars-bar spacer lcars-u-1-1"></div>
+                <div data-include="includes/rot.html"></div>
                 <div class="lcars-bar spacer lcars-u-1-1"></div>
                 <div data-include="includes/depth.html"></div>
                 <div class="lcars-bar spacer lcars-u-1-1"></div>

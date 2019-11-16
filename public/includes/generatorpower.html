@@ -1,5 +1,11 @@
-<div class="lcars-bar lcars-u-1 horizontal both-divider button" style="position:relative;"
-     data-button='{ "function": "toggleOverlay", "params": { "overlay": "overlay-sensorlog.html", "function": "displaySensorLog", "params": { "group": "acpower", "chart": "day" } } }'>
+<div class="lcars-bar lcars-u-1 horizontal both-divider"
+     onClick="Overlay.createOverlay([
+            'includes/overlays/power/history-hour.html',
+            'includes/overlays/power/history-day.html',
+            'includes/overlays/power/history-week.html',
+            'includes/overlays/power/history-month.html',
+            'includes/overlays/power/history-year.html',
+     ])">
     <div id="generatorpower" class="widget lcars-label"
          data-signalk-path="electrical.inverters.257.acin2.power"
          data-widget-options='{ "text": { "placeholder": "---", "function": { "name": "multiply", "factor": 0.001, "places": 1 } } }'>

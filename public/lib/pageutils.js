@@ -3,7 +3,34 @@ class PageUtils {
 	constructor(options) {
         PageUtils.overlayOnLoad = (options.overlayOnLoad)?options.overlayOnLoad:null;
         PageUtils.overlayObject = undefined;
+        PageUtils.overlays = [];
 	}
+
+    /**
+     * Return the value associated with <name> from local storage.  If the
+     * named value is not defined then return <fallback> and create a new
+     * local storage entry for <name>.
+     *
+     * param name - name of the storage item to be retrieved.
+     * param fallback - value to be returned if the named item is not defined.
+     */
+ 
+    static getStorageItem(name, fallback) {
+        //console.log("getStorageItem(%s,%s)...", name, fallback);
+
+        var retval = window.localStorage.getItem("pdjr-" + name);
+        if ((retval == null) && (fallback !== undefined)) {
+            window.localStorage.setItem("pdjr-" + name, fallback);
+            retval = fallback;
+        }
+        return(retval);
+    }
+
+    static setStorageItem(name, value) {
+        console.log("setStorageItem(%s,%s)...", name, value);
+
+        window.localStorage.setItem("pdjr-" + name, value);
+    }
 
     static getAttributeValue(element, name, subname) {
         //console.log("getAttributeValue(%s,%s,%s)...", JSON.stringify(element), name, subname);
@@ -74,48 +101,6 @@ class PageUtils {
 		    }
 		});
 	}
-
-    static openOverlay(source) {
-        //console.log("openOverlay(%s)...", source);
-
-        PageUtils.overlayObject = undefined;
-
-        var overlay = document.getElementById("overlay");
-        if (overlay) {
-            overlay.style.display = "flex";
-            var container = document.getElementById("overlay-container");
-            if (container) {
-                while (container.firstChild) container.removeChild(container.firstChild );
-                //container.innerHtml = "";
-                if (typeof source === "function") {
-                    PageUtils.overlayObject = source();
-                    container.appendChild(PageUtils.overlayObject.getTree());
-                } else {
-                    container.innerHTML = PageUtils.httpGet(source);
-                }
-                var titles = document.querySelectorAll('[data-overlay-title]');
-                var title = (titles.length > 0)?titles[0].getAttribute("data-overlay-title"):"***";
-                var span = document.getElementById('overlay-title');
-                while (span.firstChild) span.removeChild(span.firstChild );
-                span.appendChild(document.createTextNode(title));
-
-                //if (this.overlayOnLoad) this.overlayOnLoad(root);
-            }
-        }
-    }
-
-    static gotOverlay(container, content) {
-        container.innerHTML = content;
-    }
-
-    static closeOverlay(root) {
-        if (root != null) {
-            if ((PageUtils.overlayObject) && (typeof PageUtils.overlayObject.onClose === "function")) {
-                PageUtils.overlayObject.onClose();
-            }
-            root.style.display = "none";
-        }
-    }
 
     static loadHTML(container, url, classname, callback) {
         if (container) {

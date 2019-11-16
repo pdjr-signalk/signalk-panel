@@ -1,29 +1,10 @@
-.table {
-    display: table;
-    table-layout: fixed;
+.overlay object {
     width: 100%;
-}
-
-.table-head {
-    display: table-header-group;
-}
-
-.table-head .table-cell {
-    text-align: center;
-    font-weight: bold;
-    border-bottom: 2px red;
-}
-
-.table-body {
-    display: table-row-group;
-}
-
-.table-row {
-    display: table-row;
-}
-
-.table-cell {
-    display: table-cell;
+    height: 100%;
+    border: 0px;
+    padding: 0px;
+    margin: 0px;
+    overflow: hidden;
 }
 
 .center {
@@ -137,12 +118,14 @@
     vertical-align: middle;
 }
 
-/*
-.widget-text-cell span::before {
+
+
+.overlay-content .widget-text-cell span::before {
     content: "\A";
     white-space: pre-line;
 }
-*/
+
+
 
 #overlay {
   position: fixed;

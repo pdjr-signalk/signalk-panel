@@ -5,8 +5,6 @@ function init() {
     document.addEventListener("contextmenu", (e) => { contextHandler(e); e.preventDefault(); });
     window.event.cancelBubble = true;
     
-    LOCALSTORAGE = window.localStorage;
-
     var signalk = new SignalK("192.168.1.1", 3000, FunctionFactory.getFilter, Widget.createWidget);
     var pageutils = new PageUtils({ "overlayOnLoad": function(r) { }});
 
@@ -27,4 +25,9 @@ function init() {
     });
 
     signalk.subscribe();
+
+    PageUtils.walk(document, "storageitem", function(element) {
+        console.log("Processing %s", element.className);
+        element.className.split(" ").filter(cn => (cn != "storageitem")).forEach(cn => { element.textContent = PageUtils.getStorageItem(cn); });
+    });
 }

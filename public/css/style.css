@@ -6,7 +6,7 @@
   color: #000;
   background-color: #dbefdc; }
 
-.w3-theme-l3 {
+.w3-theme-l3, .alert-editor input[type=number] {
   color: #000;
   background-color: #b7dfb8; }
 
@@ -15,7 +15,7 @@
   background-color: #93cf95; }
 
 .w3-theme-l1, .theme-active, .lcars-bar, .lcars-element .lcars-element-decorator, .lcars-text-box,
-a.lcars-text-box {
+a.lcars-text-box, .alert-editor .table-row-a, .alert-editor .table-row-b {
   color: #000;
   background-color: #6ec071; }
 
@@ -43,7 +43,7 @@ a.lcars-text-box {
   color: #000;
   background-color: #f4faf4; }
 
-.w3-theme-dark {
+.w3-theme-dark, .alert-editor {
   color: #fff;
   background-color: #265728; }
 
@@ -3072,27 +3072,13 @@ a.lcars-text-box.blink {
   width: 3.75rem;
   min-width: 3.75rem; }
 
-.table {
-  display: table;
-  table-layout: fixed;
-  width: 100%; }
-
-.table-head {
-  display: table-header-group; }
-
-.table-head .table-cell {
-  text-align: center;
-  font-weight: bold;
-  border-bottom: 2px red; }
-
-.table-body {
-  display: table-row-group; }
-
-.table-row {
-  display: table-row; }
-
-.table-cell {
-  display: table-cell; }
+.overlay object {
+  width: 100%;
+  height: 100%;
+  border: 0px;
+  padding: 0px;
+  margin: 0px;
+  overflow: hidden; }
 
 .center {
   text-align: center; }
@@ -3189,12 +3175,10 @@ a.lcars-text-box.blink {
   height: 100%;
   vertical-align: middle; }
 
-/*
-.widget-text-cell span::before {
-    content: "\A";
-    white-space: pre-line;
-}
-*/
+.overlay-content .widget-text-cell span::before {
+  content: "\A";
+  white-space: pre-line; }
+
 #overlay {
   position: fixed;
   top: 0;
@@ -3322,5 +3306,119 @@ a.lcars-text-box.blink {
   width: 50%;
   height: 100%;
   border-right: 2px solid orange; }
+
+.w3-theme-l5 {
+  color: #000;
+  background-color: #f4faf4; }
+
+.w3-theme-l4 {
+  color: #000;
+  background-color: #dbefdc; }
+
+.w3-theme-l3, .alert-editor input[type=number] {
+  color: #000;
+  background-color: #b7dfb8; }
+
+.w3-theme-l2 {
+  color: #000;
+  background-color: #93cf95; }
+
+.w3-theme-l1, .theme-active, .lcars-bar, .lcars-element .lcars-element-decorator, .lcars-text-box,
+a.lcars-text-box, .alert-editor .table-row-a, .alert-editor .table-row-b {
+  color: #000;
+  background-color: #6ec071; }
+
+.w3-theme-d1, .theme-passive, .lcars-elbow, .lcars-bar:empty, .lcars-bar.left-end.decorated:after, .lcars-bar.right-end.decorated:after, .lcars-element {
+  color: #fff;
+  background-color: #459c48; }
+
+.w3-theme-d2 {
+  color: #fff;
+  background-color: #3d8b40; }
+
+.w3-theme-d3 {
+  color: #fff;
+  background-color: #357a38; }
+
+.w3-theme-d4 {
+  color: #fff;
+  background-color: #2e6830; }
+
+.w3-theme-d5 {
+  color: #fff;
+  background-color: #265728; }
+
+.w3-theme-light {
+  color: #000;
+  background-color: #f4faf4; }
+
+.w3-theme-dark, .alert-editor {
+  color: #fff;
+  background-color: #265728; }
+
+.w3-theme-action {
+  color: #fff;
+  background-color: #265728; }
+
+.w3-theme {
+  color: #fff;
+  background-color: #4caf50; }
+
+.w3-text-theme {
+  color: #4caf50; }
+
+.w3-border-theme {
+  border-color: #4caf50; }
+
+.w3-hover-theme:hover, div[onclick]:hover {
+  color: #fff;
+  background-color: #4caf50; }
+
+.w3-hover-text-theme:hover {
+  color: #4caf50; }
+
+.w3-hover-border-theme:hover {
+  border-color: #4caf50; }
+
+.w3_alert {
+  color: #000;
+  background-color: #f00; }
+
+.alert-editor.table {
+  display: table;
+  table-layout: auto;
+  width: 100%; }
+
+.alert-editor .table-head {
+  display: table-header-group;
+  width: 100%; }
+
+.alert-editor .table-head .table-cell {
+  font-weight: bold;
+  text-align: left; }
+
+.alert-editor .table-body {
+  display: table-row-group;
+  width: 100%; }
+
+.alert-editor .table-row {
+  display: table-row; }
+
+.alert-editor .table-cell {
+  display: table-cell;
+  font-weight: bold;
+  height: 22px;
+  vertical-align: middle; }
+
+.alert-editor .alert-active {
+  background-color: orange !important; }
+
+.alert-editor input[type=number] {
+  width: 8em;
+  border: 0;
+  font-weight: bold; }
+
+.alert-editor input[type=radio] {
+  margin: 0px 15px 0px 3px; }
 
 /*# sourceMappingURL=style.css.map */
