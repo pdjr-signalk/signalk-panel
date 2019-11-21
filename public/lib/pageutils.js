@@ -56,7 +56,6 @@ class PageUtils {
 
     static wildWalk(root, classnameRegex, callback) {
         var elements = root.getElementsByTagName('div');
-        var regex = RegExp(classnameRegex);
         [...elements].forEach(element => {
             if (element.className.includes(classnameRegex)) callback(element);
         });

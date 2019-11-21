@@ -1,16 +1,11 @@
 <div class="lcars-row">
     <div class="lcars-element left-rounded lcars-u-1-1">
-        <div class="lcars-element-addition widget"
-             data-signalk-path="environment.water.temperature"
-             data-widget-options='{ "text": { "function": { "name": "temperature", "watertemp!units": "C", "watertemp!places": 1 } } }'>
-            ---
-        </div>
+        <div class="lcars-element-addition widget-text" data-parameters="seatemp">---</div>
     </div>
     <div class="lcars-element lcars-u-4">
-        <div class="widget"
-             data-signalk-path="environment.water.temperature"
-             data-widget-options='{ "scale": { "selector": "watertemp!units", "settings": { "C": [0,30,10], "K": [273,303,10] } }, "cursor": { "function": { "name": "temperaturePercent", "min": "watertemp!scale-min", "max": "watertemp!scale-max" } } }'>
-        </div>
+        <div class="widget-gauge" data-parameters="seatemp"></div>
     </div>
-    <div class="lcars-element right-rounded lcars-u-1">Temp /&nbsp;<span class="storageitem watertemp!units"></span></div>
+    <div class="lcars-element right-rounded lcars-u-1">
+        Temp/<span class="storage-item-value" data-storage-item-name="seatemp.units"></span>
+    </div>
 </div>

@@ -1,29 +1,11 @@
 <div class="lcars-row">
     <div class="lcars-element left-rounded lcars-u-1-1">
-        <div class="lcars-element-addition widget"
-             data-signalk-path="navigation.speedOverGround"
-             data-widget-options='{ "text": { "function": { "name": "sog", "sog!units": "kph", "sog!places": "1" } } }'>
-            ---
-        </div>
+        <div class="lcars-element-addition widget-text" data-parameters="sog">---</div>
     </div>
     <div class="lcars-element lcars-u-4">
-        <div class="widget"
-             data-signalk-path="navigation.speedOverGround"
-             data-widget-options='{ "scale": { "selector": "sog!units" , "settings": { "kph": [0,20,10] } }, "cursor": { "function": { "name": "percent", "min": "sog!scale-min", "max": "sog!scale-max" } } }'>
-        </div>
+        <div class="widget-gauge" data-parameters="sog"></div>
     </div>
-    <div class="lcars-element right-rounded lcars-u-1">SOG /&nbsp;<span class="storageitem sog!units"></span></div>
-</div>
-
-<div class="lcars-row">
-    <div class="lcars-element left-rounded lcars-u-1-1">
-        <div class="lcars-element-addition widget widget-text widget-text-sog">
-            ---
-        </div>
+    <div class="lcars-element right-rounded lcars-u-1">
+        SOG/<span class="storage-item-value" data-storage-item-name="sog.units"></span>
     </div>
-    <div class="lcars-element lcars-u-4">
-        <div class="widget widget-gauge widget-gauge-sog">
-        </div>
-    </div>
-    <div class="lcars-element right-rounded lcars-u-1">SOG /&nbsp;<span class="storageitem sog!units"></span></div>
 </div>

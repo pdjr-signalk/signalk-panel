@@ -1,25 +1,25 @@
 class WidgetComponent {
 
-    static createWidgetComponent(componentName, parentNode, widgetOptions, getFilterFunction) {
-        //console.log("createWidgetComponent(%s,%s,%s)...", componentName, parentNode, JSON.stringify(widgetOptions));
+    static createWidgetComponent(parentNode, type, parameters, getFilterFunction) {
+        //console.log("createWidgetComponent(%s,%s,%s)...", parentNode, type, JSON.stringify(parameters));
 
         var retval = undefined;
 
-        switch (componentName) {
+        switch (type) {
             case "alert":
-                retval = new AlertComponent(parentNode, widgetOptions, getFilterFunction);
+                retval = new AlertComponent(parentNode, parameters, getFilterFunction);
                 break;
             case "scale":
-                retval = new ScaleComponent(parentNode, widgetOptions, getFilterFunction);
+                retval = new ScaleComponent(parentNode, parameters, getFilterFunction);
                 break;
             case "cursor":
-                retval = new CursorComponent(parentNode, widgetOptions, getFilterFunction);
+                retval = new CursorComponent(parentNode, parameters, getFilterFunction);
                 break;
             case "text":
-                retval = new TextComponent(parentNode, widgetOptions, getFilterFunction);
+                retval = new TextComponent(parentNode, parameters, getFilterFunction);
                 break;
             case "indicator":
-                retval = new IndicatorComponent(parentNode, widgetOptions, getFilterFunction);
+                retval = new IndicatorComponent(parentNode, parameters, getFilterFunction);
                 break;
             default:
                 break;
@@ -28,12 +28,10 @@ class WidgetComponent {
         return(retval);
     }
 
-    constructor (parentNode, widgetOptions, getFilterFunction) {
+    constructor (parentNode, parameters, getFilterFunction) {
         this.parentNode = parentNode;
         this.tree = undefined;
         this.updateFunction = undefined;
-
-        
     }
 
     getTree() {
@@ -42,13 +40,6 @@ class WidgetComponent {
 
     update(value) {
         if (this.updateFunction !== undefined) this.updateFunction(value);
-    }
-
-    initialiseLocalStorage(name, defaultValue) {
-        //console.log("initialiseLocalStorage(%s,%s)...", name, defaultValue);
-        if (window.localStorage.getItem(name) == undefined) window.localStorage.setItem(name, defaultValue);
-        if (window.localStorage.getItem(name) == undefined) throw("error processing session storage item '" + name + "'");
-        return;
     }
 
     resolveValue(name, args, fallback) {
@@ -70,25 +61,22 @@ class WidgetComponent {
 
 class AlertComponent extends WidgetComponent {
 
-    constructor(parentNode, widgetOptions, getFilterFunction) {
-        //console.log("AlertComponent(%s,%s)...", parentNode, JSON.stringify(widgetOptions));
+    constructor(parentNode, parameters, getFilterFunction) {
+        console.log("AlertComponent(%s,%s)...", parentNode, JSON.stringify(parameters));
 
-        super(parentNode, widgetOptions, getFilterFunction);
+        super(parentNode, parameters, getFilterFunction);
 
         try {
-            super.initialiseLocalStorage(parentNode.id + "-test", widgetOptions["alert"]["defaults"]["test"]);
-            super.initialiseLocalStorage(parentNode.id + "-threshold", widgetOptions["alert"]["defaults"]["threshold"]);
-            super.initialiseLocalStorage(parentNode.id + "-disabled", widgetOptions["alert"]["defaults"]["disabled"]);
 
             // Update parentNode class membership
             //
-            parentNode.classList.add("alert", parentNode.id);
+            var alertClass = parentNode.id;
+            parentNode.classList.add(alertClass);
 
             // Add event listener to parentNode so that alerts can be cancelled
             //
             parentNode.addEventListener("click", function(e) { 
-                var elems = document.getElementsByClassName(parentNode.id);
-                //Array.prototype.forEach.call(elems, e => {
+                var elems = document.getElementsByClassName(alertClass);
                 [...elems].forEach(e => {
                     if (parentNode.classList.contains("alert-cancelled")) {
                         e.classList.remove("alert-cancelled");
@@ -98,23 +86,22 @@ class AlertComponent extends WidgetComponent {
                 });
             });
 
-            if (widgetOptions["alert"]["function"]) {
-                var func = getFilterFunction(widgetOptions["alert"]["function"]);
-                if (func) {
-                    var parentNode = parentNode;
-                    super.updateFunction = function(v) {
-                        var elems = document.getElementsByClassName(parentNode.id);
-                        if (window.localStorage.getItem(parentNode.id + "-disabled") == "0") {
-                            if (func(v)) {
-                                [...elems].forEach(e => { e.classList.add("alert-active"); if (e != parentNode) e.classList.add("alert-cancelled"); });
-                            } else {
-                                [...elems].forEach(e => { e.classList.remove("alert-active"); e.classList.remove("alert-cancelled"); });
-                            }
-                        } else {
-                            parentNode.classList.add("alert-disabled");
-                            [...elems].forEach(e => { e.classList.remove("alert-active"); e.classList.remove("alert-cancelled"); });
-                        }
+            var parentNode = parentNode;
+            var parameters = parameters;
+            super.updateFunction = function(v) {
+                var test = parameters.getParameter("alert-test")[0];
+                var threshold = parameters.getParameter("alert-threshold", parseFloat);
+                var disabled = parameters.getParameter("alert-disabled", parseInt);
+                var elems = document.getElementsByClassName(alertClass);
+                if (!disabled) {
+                    if (((test == "lt") && (v < threshold)) || ((test == "eq") && (v == threshold)) || ((test == "gt") && (v > threshold))) {
+                        [...elems].forEach(e => { e.classList.add("alert-active"); if (e != parentNode) e.classList.add("alert-cancelled"); });
+                    } else {
+                        [...elems].forEach(e => { e.classList.remove("alert-active"); e.classList.remove("alert-cancelled"); });
                     }
+                } else {
+                    parentNode.classList.add("alert-disabled");
+                    [...elems].forEach(e => { e.classList.remove("alert-active"); e.classList.remove("alert-cancelled"); });
                 }
             }
         } catch(e) {
@@ -125,38 +112,31 @@ class AlertComponent extends WidgetComponent {
 
 class ScaleComponent extends WidgetComponent {
 
-    constructor(parentNode, widgetOptions, getFilterFunction) {
-        console.log("ScaleComponent(%s,%s)...", parentNode, JSON.stringify(widgetOptions));
+    constructor(parentNode, parameters) {
+        //console.log("ScaleComponent(%s,%s)...", parentNode, parameters);
 
-        super(parentNode, widgetOptions, getFilterFunction);
+        super(parentNode, parameters);
 
-        var direction = (widgetOptions.direction)?widgetOptions.direction:"horizontal";
-        var selector = super.resolveValue("selector", widgetOptions.scale);
-        var settings = widgetOptions.scale.settings;
-        if ((settings !== undefined) && (selector !== undefined)) {
-            var scale = PageUtils.getStorageItem(selector);
-            if ((scale !== undefined) && (settings[scale] !== undefined)) {
-                var [min,max,ticks] = settings[scale];
-                PageUtils.setStorageItem(selector.split("!")[0] + "!scale-min", min);
-                PageUtils.setStorageItem(selector.split("!")[0] + "!scale-max", max);
-            } else {
-                console.log("ignoring malformed definition for ScaleComponent");
-            }
-        } else {
-            console.log("ScaleComponent: configuration error (required attributes are missing)");
-        }
+        var direction = (parentNode.classList.contains("vertical"))?"vertical":"horizontal";
+        var navigation = parentNode.classList.contains("navigation");
+        var selector = parameters.getParameter("units")[0];
+        var scale = parameters.getParameter("scales")[selector];
 
         var div = document.createElement("div");
         div.className = "widget-component widget-scale" + ((direction == "horizontal")?" widget-horizontal":" widget-vertical");
 
-        for (var i = 0, tick; i <= ticks; i++) {
-            tick = document.createElement("div");
+        for (var i = 0; i <= scale.ticks; i++) {
+            var tick = document.createElement("div");
+            var tickValue = Number(scale.min) + (((scale.max - scale.min) / scale.ticks) * i);
+            tick.setAttribute("data-tick-value", Math.abs(tickValue));
             tick.className = "widget-scale-tick";
-            tick.setAttribute("data-tick-value", Math.abs(Number(min) + (((max - min) / ticks) * i)));
+            if (navigation && (tickValue < 0)) tick.classList.add("port");
+            if (navigation && (tickValue > 0)) tick.classList.add("starboard");
+            
             if (direction == "horizontal") {
-                tick.style.width = ((i / ticks) * 100) + "%";
+                tick.style.width = ((i / scale.ticks) * 100) + "%";
             } else {
-                tick.style.height = ((i / ticks) * 100) + "%";
+                tick.style.height = ((i / scale.ticks) * 100) + "%";
             }
             div.appendChild(tick); 
         }
@@ -167,29 +147,27 @@ class ScaleComponent extends WidgetComponent {
 
 class CursorComponent extends WidgetComponent {
 
-    constructor(parentNode, widgetOptions, getFilterFunction) {
-        //console.log("CursorComponent(%s,%s)...", parentNode, JSON.stringify(widgetOptions));
+    constructor(parentNode, parameters, filterFunction) {
+        //console.log("CursorComponent(%s,%s)...", parentNode, parameters);
 
-        super(parentNode, widgetOptions, getFilterFunction);
+        super(parentNode, parameters, filterFunction);
 
-        var direction = (widgetOptions.direction)?widgetOptions.direction:"horizontal";
+        var direction = (parentNode.classList.contains("vertical"))?"vertical":"horizontal";
 
         var div = document.createElement("div");
         div.className = "widget-component widget-cursor " + ((direction == "horizontal")?"widget-horizontal":"widget-vertical");
         super.tree = div;
 
-        if (widgetOptions.cursor["function"]) {
-            var func = getFilterFunction(widgetOptions.cursor["function"]);
-            if (func) {
-                if (direction == "horizontal") {
-                    super.updateFunction = function(v) {
-                        div.style.width = func(v) + "%";
-                    };
-                } else {
-                    super.updateFunction = function(v) {
-                        div.style.height = func(v) + "%";
-                    };
-                }
+        var func = filterFunction(parameters.getParameter("filter") + "Percent", parameters);
+        if (func) {
+            if (direction == "horizontal") {
+                super.updateFunction = function(v) {
+                    div.style.width = func(v) + "%";
+                };
+            } else {
+                super.updateFunction = function(v) {
+                    div.style.height = func(v) + "%";
+                };
             }
         }
     }
@@ -198,18 +176,15 @@ class CursorComponent extends WidgetComponent {
 
 class TextComponent extends WidgetComponent {
 
-    constructor(parentNode, widgetOptions, getFilterFunction) {
-        //console.log("TextComponent(%s,%s)...", parentNode, JSON.stringify(widgetOptions));
+    constructor(parentNode, parameters, filterFunction) {
+        //console.log("TextComponent(%s,%s)...", parentNode, parameters);
 
-        super(parentNode, widgetOptions, getFilterFunction);
+        super(parentNode, parameters, filterFunction);
 
-        var direction = (widgetOptions.direction)?widgetOptions.direction:"horizontal";
-
-        var placeholder = (widgetOptions.text.placeholder)?widgetOptions.text.placeholder:"---";
-        var classes = (widgetOptions.text.classes)?widgetOptions.text.classes:undefined;
+        var direction = (parentNode.classList.contains("vertical"))?"vertical":"horizontal";
 
         var table  = document.createElement("div");
-        table.className = "widget-component widget-text" + ((classes)?(" " + classes):"");
+        table.className = "widget-component widget-text";
         var cell = document.createElement("div");
         cell.className = "widget-text-cell";
         table.appendChild(cell);
@@ -221,13 +196,12 @@ class TextComponent extends WidgetComponent {
         if ((found) && (found.length >= 3)) cell.appendChild(document.createTextNode(found[2]));
         super.tree = table;
 
-        if (widgetOptions.text["function"]) {
-            var func = getFilterFunction(widgetOptions.text["function"]);
-            if (func) {
-                super.updateFunction = function(v) {
-                    span.innerHTML = func(v);
-                };
-            }
+        var func = filterFunction(parameters.getParameter("filter"), parameters);
+        if (func) {
+            super.updateFunction = function(v) {
+                v = func(v);
+                span.innerHTML = (v.startsWith("-"))?v.substr(1):v;
+            };
         }
     }
 
@@ -235,19 +209,19 @@ class TextComponent extends WidgetComponent {
 
 class IndicatorComponent extends WidgetComponent {
 
-    constructor(parentNode, widgetOptions, getFilterFunction) {
-        //console.log("IndicatorComponent(%s,%s)...", parentNode, JSON.stringify(widgetOptions));
+    constructor(parentNode, parameters, filterFunction) {
+        console.log("IndicatorComponent(%s,%s)...", parentNode, JSON.stringify(parameters));
 
-        super(parentNode, widgetOptions, getFilterFunction);
+        super(parentNode, parameters, filterFunction);
 
-        var placeholder = (widgetOptions.indicator.placeholder)?widgetOptions.indicator.placeholder:"---";
-        var onclass = (widgetOptions.indicator.on["class"])?widgetOptions.indicator.on["class"]:"";
-        var onvalue = (widgetOptions.indicator.on["value"])?widgetOptions.indicator.on["value"]:"";
-        var offclass = (widgetOptions.indicator.off["class"])?widgetOptions.indicator.off["class"]:"";
-        var offvalue = (widgetOptions.indicator.off["value"])?widgetOptions.indicator.off["value"]:"";
+        var onclass = parameters.getParameter("onclass") || "widget-indicator-on";
+        var onvalue = parameters.getParameter("onvalue") || "";
+        var offclass = parameters.getParameter("offclass") || "widget-indicator-off";
+        var offvalue = parameters.getParameter("offvalue") || ""
+        var notification = parentNode.innerHTML.includes("---");
 
         var div = document.createElement("div");
-        div.className = "widget-component " + ((parentNode.innerHTML.includes("---"))?"widget-notification":"widget-indicator");
+        div.className = "widget-component " + ((notification)?"widget-notification":"widget-indicator");
         var span = document.createElement("span"); 
         span.innerHTML = "";
         var found = parentNode.innerHTML.match(/(.*)---(.*)/);
@@ -256,17 +230,16 @@ class IndicatorComponent extends WidgetComponent {
         if ((found) && (found.length >= 3)) div.appendChild(document.createTextNode(found[2]));
         super.tree = div;
 
-        if (widgetOptions.indicator["function"]) {
-            var func = getFilterFunction(widgetOptions.indicator["function"]);
+        if (parameters.getParameter("filter") !== undefined) {
+            var func = filterFunction(parameters.getParameter("filter"));
             if (func) {
                 super.updateFunction = function(v) {
-                    var r = func(v);
-                    if (r) {
-                        span.innerHTML = (typeof r === "string")?r:onvalue;
+                    if (func(v)) {
+                        if (notification) span.innerHTML = r;
                         div.classList.remove(offclass);
                         div.classList.add(onclass);
                     } else {
-                        span.innerHTML = "";
+                        if (notification) span.innerHTML = "";
                         div.classList.remove(onclass);
                         div.classList.add(offclass);
                     }

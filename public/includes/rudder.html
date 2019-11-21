@@ -1,16 +1,11 @@
 <div class="lcars-row">
     <div class="lcars-element left-rounded lcars-u-1-1">
-        <div class="widget lcars-element-addition"
-             data-signalk-path="steering.rudderAngle"
-             data-widget-options='{ "text": { "function": { "name": "rudderAngle", "rudder!units": "deg", "rudder!places": 0 } } }'>
-             ---
-        </div>
+        <div class="lcars-element-addition widget-text" data-parameters="rudder">---</div>
     </div>
     <div class="lcars-element lcars-u-4">
-        <div class="widget"
-             data-signalk-path="steering.rudderAngle"
-             data-widget-options='{ "scale": { "selector": "rudder!units", "settings": { "deg": [-50,50,10] } }, "cursor": { "function": { "name": "rudderPercent", "min": "rudder!scale-min", "max": "rudder!scale-max" } } }'>
-        </div>
+        <div class="navigation widget-gauge" data-parameters="rudder"></div>
     </div>
-    <div class="lcars-element right-rounded lcars-u-1">Rudder /&nbsp<span class="storageitem rudder!units"></span></div>
+    <div class="lcars-element right-rounded lcars-u-1">
+        Rudder/<span class="storage-item-value" data-storage-item-name="rudder.units"></span>
+    </div>
 </div>

@@ -63,7 +63,7 @@ class AlertEditor {
                     if (e.checked != e.defaultChecked) changed.push([ e.name, (e.checked)?"1":"0" ]);
                     break;
                 case 'radio':
-                    if ((e.checked != e.defaultChecked) && e.checked) changed.push([ e.name, (e.checked)?"1":"0" ]);
+                    if ((e.checked != e.defaultChecked) && e.checked) changed.push([ e.name, e.value ]);
                     break;
                 default:
                     break;
@@ -73,7 +73,21 @@ class AlertEditor {
         if (changed.length > 0) {
             if (confirm("Save changes?")) {
                 [...changed].forEach(([n,v]) => {
-                    window.localStorage.setItem(n, v);
+                    switch (n.split('.')[1]) {
+                        case "alert-disabled":
+                            LocalStorage.setItem(n, v);
+                            break;
+                        case "alert-test":
+                            var testArr = LocalStorage.getItem(n);
+                            for (var i = 0; ((i < testArr.length) && (testArr[0] != v)); i++) testArr.push(testArr.shift());
+                            LocalStorage.setItem(n, JSON.stringify(testArr));
+                            break;
+                        case "alert-threshold":
+                            LocalStorage.setItem(n, v);
+                            break;
+                        default:
+                            break;
+                    }
                 });
             }
         }
@@ -94,8 +108,8 @@ class AlertEditor {
         var rowstyle = [ "table-row-a", "table-row-b" ];
         var body = document.createElement("div");
         body.className = "table-body";
-        PageUtils.walk(document, "alert", element => {
-            var row = this.tableRow(element);
+        PageUtils.walk(document, "widget-alert", element => {
+            var row = this.tableRow(element.id, Parameters.createParameters(element.getAttribute("data-parameters")));
             row.classList.add(rowstyle[0]);
             body.appendChild(row);
             rowstyle = rowstyle.push(rowstyle.shift());
@@ -103,36 +117,36 @@ class AlertEditor {
         return(body);
     }
 
-    tableRow(element) {
+    tableRow(id, parameters) {
         var row = document.createElement("div");
         row.className = "table-row";
-
-        row.appendChild(this.nameCell(element));
-        row.appendChild(this.testCell(element));
-        row.appendChild(this.thresholdCell(element));
-        row.appendChild(this.disabledCell(element));
-        row.appendChild(this.activeCell(element));
-
+        row.appendChild(this.nameCell(id, parameters));
+        row.appendChild(this.testCell(id, parameters));
+        row.appendChild(this.thresholdCell(id, parameters));
+        row.appendChild(this.disabledCell(id, parameters));
+        row.appendChild(this.activeCell(id, parameters));
         return(row);
     }
 
-    nameCell(element) {
+    nameCell(id, parameters) {
         var cell = document.createElement("div");
         cell.className = "table-cell alert-editor-name";
-        cell.appendChild(document.createTextNode(element.id));
+        cell.appendChild(document.createTextNode(id));
         return(cell);
     }
 
-    testCell(element) {
+    testCell(id, parameters) {
+        var tests = parameters.getParameter("alert-test");
+        var test = tests[0];
         var cell = document.createElement("div");
         cell.className = "table-cell alert-editor-test";
-        [ "eq", "gt", "lt" ].forEach(label => {
+        tests.sort().forEach(label => {
             var input = document.createElement("input");
             input.setAttribute("type", "radio");
-            input.setAttribute("name", element.id + "-test");
+            input.setAttribute("name", parameters.getParamString() + ".alert-test");
             input.setAttribute("value", label);
-            input.checked = (window.localStorage.getItem(element.id + "-test") == label);
-            input.defaultChecked = (window.localStorage.getItem(element.id + "-test") == label);
+            input.checked = (test == label);
+            input.defaultChecked = (test == label);
             var elabel = document.createElement("label");
             elabel.appendChild(document.createTextNode(label)); 
             elabel.appendChild(input);
@@ -141,33 +155,35 @@ class AlertEditor {
         return(cell);
     }
         
-    thresholdCell(element) {
+    thresholdCell(id, parameters) {
+        var threshold = parameters.getParameter("alert-threshold", parseFloat);
         var cell = document.createElement("div");
         cell.className = "table-cell alert-editor-threshold";
         var input = document.createElement("input");
-        input.setAttribute("name", element.id + "-threshold");
+        input.setAttribute("name", parameters.getParamString() + ".alert-threshold");
         input.setAttribute('type', 'number');
-        input.setAttribute('value', window.localStorage.getItem(element.id + "-threshold"));
+        input.setAttribute('value', threshold);
         cell.appendChild(input);
         return(cell);
     }
 
-    disabledCell(element) {
+    disabledCell(id, parameters) {
+        var disabled = parameters.getParameter("alert-disabled");
         var cell = document.createElement("div");
         cell.className = "table-cell alert-editor-disabled";
         var input = document.createElement("input");
-        input.setAttribute("name", element.id + "-disabled");
+        input.setAttribute("name", parameters.getParamString() + ".alert-disabled");
         input.setAttribute('type', 'checkbox');
-        input.checked = (window.localStorage.getItem(element.id + "-disabled") == "1");
-        input.defaultChecked = (window.localStorage.getItem(element.id + "-disabled") == "1");
+        input.checked = (disabled == "1");
+        input.defaultChecked = (disabled == "1");
         cell.appendChild(input);
         return(cell);
     }
 
-    activeCell(element) {
+    activeCell(id, parameters) {
         var cell = document.createElement("div");
-        cell.className = "table-cell alert-editor-active " + element.id;
-        if (element.classList.contains("alert-cancelled")) cell.classList.add("alert-cancelled");
+        cell.className = "table-cell alert-editor-active " + (parameters.getParamString() + "-alert");
+        if (document.getElementById(id).classList.contains("alert-active")) cell.classList.add("alert-active");
         return(cell);
     }
 

@@ -9,25 +9,37 @@ function init() {
     var pageutils = new PageUtils({ "overlayOnLoad": function(r) { }});
 
     PageUtils.include(document);
-
-    PageUtils.walk(document, "signalk", function(element) {
-        var path = PageUtils.getAttributeValue(element, "data-signalk-path");
-        var filter = FunctionFactory.getFilter(PageUtils.getAttributeValue(element, "data-filter"));
-        signalk.interpolateValue(path, element, filter);
+    PageUtils.walk(document, "storage-config", element => LocalStorage.initialise(element));
+    PageUtils.walk(document, "storage-item-value", element => {
+        element.innerHTML = LocalStorage.getAtom(element.getAttribute("data-storage-item-name"))
     });
-    
-    PageUtils.wildWalk(document, "widget", function(element) {
-        var signalkPath = PageUtils.getAttributeValue(element, "data-signalk-path");
-        var widgetOptions = PageUtils.getAttributeValue(element, "data-widget-options");
-        if ((signalkPath) && (widgetOptions)) {
-            signalk.registerCallback(signalkPath, new Widget(element, widgetOptions, WidgetComponent.createWidgetComponent, FunctionFactory.getFilter));
+
+    PageUtils.wildWalk(document, "signalk-", element => {
+        if (element.classList.contains("signalk-static")) {
+            var path = PageUtils.getAttributeValue(element, "data-signalk-path");
+            var filter = FunctionFactory.getFilter(PageUtils.getAttributeValue(element, "data-filter"));
+            signalk.interpolateValue(path, element, filter);
+        }
+        if (element.classList.contains("signalk-dynamic")) {
+            var path = PageUtils.getAttributeValue(element, "data-signalk-path");
+            var filter = FunctionFactory.getFilter(PageUtils.getAttributeValue(element, "data-filter"));
+            signalk.registerCallback(path, function(v) { alert("Hello"); });
+        }
+    });
+
+    PageUtils.wildWalk(document, "widget-", element => {
+        var widgetType = element.className.split(" ").reduce((a,v) => { return((v.startsWith("widget-"))?v.substr(7):undefined); }, undefined);
+        if (widgetType != undefined) {
+            if (element.hasAttribute("data-parameters")) {
+                var params = Parameters.createParameters(element.getAttribute("data-parameters"));
+                var source = params.getParameter("source");
+                if (source !== undefined) {
+                    signalk.registerCallback(source, Widget.createWidget(element, widgetType, params, WidgetComponent.createWidgetComponent, FunctionFactory.getFilter));
+                }
+            } 
         }
     });
 
     signalk.subscribe();
 
-    PageUtils.walk(document, "storageitem", function(element) {
-        console.log("Processing %s", element.className);
-        element.className.split(" ").filter(cn => (cn != "storageitem")).forEach(cn => { element.textContent = PageUtils.getStorageItem(cn); });
-    });
 }

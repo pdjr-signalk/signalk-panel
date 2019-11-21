@@ -3,6 +3,8 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<script type="text/javascript" src="lib/drag.js"></script>
+	<script type="text/javascript" src="lib/LocalStorage.js"></script>
+	<script type="text/javascript" src="lib/Parameters.js"></script>
 	<script type="text/javascript" src="lib/FunctionFactory.js"></script>
 	<script type="text/javascript" src="lib/Overlay.js"></script>
 	<script type="text/javascript" src="lib/Widget.js"></script>
@@ -28,6 +30,7 @@
     </style>
 </head>
 <body onload="init();">
+    <div data-include="config.html"></div>
     <div class="lcars-app-container">
 
         <!-- HEADER ==================================================== -->
@@ -44,7 +47,7 @@
             <div class="lcars-bar horizontal lcars-p-1"></div>
             <div class="lcars-bar fill horizontal both-divider"></div>
             <div class="lcars-bar horizontal">
-                <div class="signalk lcars-title right" data-signalk-path="name"></div>
+                <div class="signalk-static lcars-title right" data-signalk-path="name"></div>
             </div>
             <div class="lcars-bar horizontal right-end decorated" onClick="Overlay.createOverlay(AlertEditor.createAlertEditor)">
             </div>
@@ -79,7 +82,7 @@
             <div data-include="includes/waste.html"></div>
             <div class="lcars-bar horizontal bottom lcars-p-1"></div>
             <div data-include="includes/notification.html"></div>
-            <div class="lcars-bar horizontal right-end left-divider bottom"></div>
+            <div class="lcars-bar horizontal right-end left-divider bottom" onClick="localStorage.clear(); location.reload();"></div>
         </div>
 
         <!-- MAIN CONTAINER ============================================ -->

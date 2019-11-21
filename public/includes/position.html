@@ -1,17 +1,9 @@
 <div class="lcars-bar lcars-u-1-2" onClick="Overlay.createOverlay('includes/overlays/chart/chart.html')">
     <div class="lcars-text-box lcars-melrose-bg full-centered clickfree" style="position: relative;">
-        <div id="latitude" class="widget lcars-label"
-             data-signalk-path="navigation.position"
-             data-widget-options='{ "text": { "placeholder": "---", "function": { "name": "toLatitude" } } }'>
-            ---
-        </div>
+        <div class="lcars-label widget-text" data-parameters="latitude">---</div>
     </div>
     <div class="lcars-text-box full-centered clickfree" style="position: relative;">
-        <div id="longitude" class="widget lcars-label"
-             data-signalk-path="navigation.position"
-             data-widget-options='{ "text": { "placeholder": "---", "function": { "name": "toLongitude" } } }'>
-            ---
-        </div>
+        <div class="lcars-label widget-text" data-parameters="longitude">---</div>
     </div>
     <div class="lcars-text-box bottom-right passive clickfree">POS</div>
 </div>

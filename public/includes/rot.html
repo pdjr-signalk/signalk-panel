@@ -1,16 +1,11 @@
 <div "rot" class="lcars-row">
     <div class="lcars-element left-rounded lcars-u-1-1">
-        <div class="widget lcars-element-addition"
-             data-signalk-path="navigation.rateOfTurn"
-             data-widget-options='{ "text": { "function": { "name": "rateOfTurn", "rot!units": "dpm", "rot!places": 0 } } }'>
-             ---
-        </div>
+        <div class="lcars-element-addition widget-text" data-parameters="rot">---</div>
     </div>
     <div class="lcars-element lcars-u-4">
-        <div class="widget"
-             data-signalk-path="navigation.rateOfTurn"
-             data-widget-options='{ "scale": { "selector": "rot!units", "settings": { "dpm": [-120,120,12] } }, "cursor": { "function": { "name": "rateOfTurnPercent", "min": "rot!scale-min", "max": "rot!scal-max" } } }'>
-        </div>
+        <div class="navigation widget-gauge" data-parameters="rot"></div>
     </div>
-    <div class="lcars-element right-rounded lcars-u-1">ROT /&nbsp;<span class="storageitem rot!units"></span></div>
+    <div class="lcars-element right-rounded lcars-u-1">
+        Rot/<span class="storage-item-value" data-storage-item-name="rot.units"></span>
+    </div>
 </div>

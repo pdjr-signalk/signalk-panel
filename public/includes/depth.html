@@ -1,20 +1,11 @@
 <div class="lcars-row">
     <div class="lcars-element left-rounded lcars-u-1-1">
-        <div class="lcars-element-addition widget"
-            data-signalk-path="environment.depth.belowTransducer"
-            data-widget-options='{ "text": { "function": { "name": "depth", "depth!units": "m", "depth!places": 1 } } }'>
-            ---
-        </div>
+        <div class="lcars-element-addition widget-text" data-parameters="depth">---</div>
     </div>
     <div class="lcars-element lcars-u-4">
-        <div class="widget"
-            data-signalk-path="environment.depth.belowTransducer"
-            data-widget-options='{ "scale": { "selector": "depth!units", "settings": { "m": [0,5,10] } }, "cursor": { "function": { "name": "percent", "min": "depth!scale-min", "max": "depth!scale-max" } } }'>
-        </div>
+        <div class="widget-gauge" data-parameters="depth"></div>
     </div>
-    <div id="depth-alert" class="lcars-element right-rounded lcars-u-1-1 widget"
-         data-signalk-path="environment.depth.belowTransducer"
-         data-widget-options='{ "alert": { "function": { "name": "test", "depth!alert-test": "lt": "depth!alert-threshold": 2 }, "disabled": 0 } }'>
-        Depth /&nbsp;<span class="storageitem depth!units"></span>
+    <div id="depth-alert" class="lcars-element right-rounded lcars-u-1-1 widget-alert" data-parameters="depth">
+        Depth/<span class="storage-item-value" data-storage-item-name="depth.units"></span>
     </div>
 </div>

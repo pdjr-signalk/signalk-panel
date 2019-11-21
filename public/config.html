@@ -1,0 +1,129 @@
+<div class="storage-config">
+
+    <div class="storage-group" data-name="date">
+        <div class="storage-item" data-name="source" data-value="navigation.datetime"></div>
+        <div class="storage-item" data-name="filter" data-value="date"></div>
+    </div>
+    
+    <div class="storage-group" data-name="time">
+        <div class="storage-item" data-name="source" data-value="navigation.datetime"></div>
+        <div class="storage-item" data-name="filter" data-value="time"></div>
+    </div>
+
+    <div class="storage-group" data-name="sog">
+        <div class="storage-item" data-name="source" data-value="navigation.speedOverGround"></div>
+        <div class="storage-item" data-name="filter" data-value="multiply"></div>
+        <div class="storage-item" data-name="units" data-value='["kph","kts","mph","mps"]'></div>
+        <div class="storage-item" data-name="scales" data-value='{ "kph": { "min": 0, "max": 20, "ticks": 10, "factor": 1.0, "offset": 0, "places": 1 }, "kts": { "min": 0, "max": 10, "ticks": 10, "factor": 0.539957, "offset": 0, "places": 1 }, "mph": { "min": 0, "max": 12, "ticks": 12, "factor": 0.621371, "offset": 0, "places": 1 }, "mps": { "min": 0, "max": 100, "ticks": 10, "factor": 0.277778, "offset": 0, "places": 1 }}'></div>
+    </div>
+
+    <div class="storage-group" data-name="rot">
+        <div class="storage-item" data-name="source" data-value="navigation.rateOfTurn"></div>
+        <div class="storage-item" data-name="filter" data-value="multiply"></div>
+        <div class="storage-item" data-name="units" data-value='["dpm"]'></div>
+        <div class="storage-item" data-name="scales" data-value='{ "dpm": { "min": -120, "max": 120, "ticks": 10, "factor": 3437.736, "offset": 0, "places": 0 } }'></div>
+    </div>
+
+    <div class="storage-group" data-name="depth">
+    	<div class="storage-item" data-name="source" data-value="environment.depth.belowTransducer"></div>
+    	<div class="storage-item" data-name="filter" data-value="multiply"></div>
+    	<div class="storage-item" data-name="units" data-value='["m","ft","ftm"]'></div>
+    	<div class="storage-item" data-name="scales" data-value='{ "m": { "min": 0, "max": 5, "ticks": 10, "factor": 1.0, "offset": 0, "places": 1 }, "ft": { "min": 0, "max": 20, "ticks": 10, "factor": 3.28084, "offset": 0, "places": 1 }, "ftm": { "min": 0, "max": 3, "ticks": 12, "factor": 0.546807, "offset": 0, "places": 1 } }'></div>
+        <div class="storage-item" data-name="alert-test" data-value='["lt","eq","gt"]'></div>
+        <div class="storage-item" data-name="alert-threshold" data-value='1.7'></div>
+        <div class="storage-item" data-name="alert-disabled" data-value='0'></div>
+    </div>
+
+    <div class="storage-group" data-name="seatemp">
+    	<div class="storage-item" data-name="source" data-value="environment.water.temperature"></div>
+    	<div class="storage-item" data-name="filter" data-value="multiply"></div>
+    	<div class="storage-item" data-name="units" data-value='["C","K"]'></div>
+    	<div class="storage-item" data-name="scales" data-value='{ "C": { "min": 0, "max": 30, "ticks": 10, "factor": 0.1, "offset": -273, "places": 0 }, "K": { "min": 273, "max": 303, "ticks": 10, "factor": 0.1, "offset": 0, "places": 0 } }'></div>
+    </div>
+
+    <div class="storage-group" data-name="rudder">
+        <div class="storage-item" data-name="source" data-value="steering.rudderAngle"></div>
+        <div class="storage-item" data-name="filter" data-value="multiply"></div>
+        <div class="storage-item" data-name="units" data-value='["deg"]'></div>
+        <div class="storage-item" data-name="scales" data-value='{ "deg": { "min": -50, "max": 50, "ticks": 10, "factor": 57.2958, "offset": 0, "places": 0 } }'></div>
+    </div>
+
+    <div class="storage-group" data-name="latitude">
+        <div class="storage-item" data-name="source" data-value="navigation.position"></div>
+        <div class="storage-item" data-name="filter" data-value="latitude"></div>
+    </div>
+
+    <div class="storage-group" data-name="longitude">
+        <div class="storage-item" data-name="source" data-value="navigation.position"></div>
+        <div class="storage-item" data-name="filter" data-value="longitude"></div>
+    </div>
+
+    <div class="storage-group" data-name="heading">
+        <div class="storage-item" data-name="source" data-value="navigation.headingTrue"></div>
+        <div class="storage-item" data-name="filter" data-value="degrees"></div>
+    </div>
+    
+    <div class="storage-group" data-name="shorepower">
+        <div class="storage-item" data-name="source" data-value="electrical.inverters.257.acin.power"></div>
+        <div class="storage-item" data-name="filter" data-value="multiply"></div>
+        <div class="storage-item" data-name="units" data-value='["kW","W"]'></div>
+   	    <div class="storage-item" data-name="scales" data-value='{ "kW": { "min": 0, "max": 10, "ticks": 10, "factor": 0.001, "offset": 0, "places": 1 }, "W": { "min": 0, "max": 10000, "ticks": 10, "factor": 1.0, "offset": 0, "places": 0 } }'></div>
+    </div>
+
+    <div class="storage-group" data-name="genpower">
+        <div class="storage-item" data-name="source" data-value="electrical.inverters.257.acin2.power"></div>
+        <div class="storage-item" data-name="filter" data-value="multiply"></div>
+        <div class="storage-item" data-name="units" data-value='["kW","W"]'></div>
+   	    <div class="storage-item" data-name="scales" data-value='{ "kW": { "min": 0, "max": 10, "ticks": 10, "factor": 0.001, "offset": 0, "places": 1 }, "W": { "min": 0, "max": 10000, "ticks": 10, "factor": 1.0, "offset": 0, "places": 0 } }'></div>
+    </div>
+
+    <div class="storage-group" data-name="invpower">
+        <div class="storage-item" data-name="source" data-value="electrical.inverters.257.acout.power"></div>
+        <div class="storage-item" data-name="filter" data-value="multiply"></div>
+        <div class="storage-item" data-name="units" data-value='["kW","W"]'></div>
+   	    <div class="storage-item" data-name="scales" data-value='{ "kW": { "min": 0, "max": 10, "ticks": 10, "factor": 0.001, "offset": 0, "places": 1 }, "W": { "min": 0, "max": 10000, "ticks": 10, "factor": 1.0, "offset": 0, "places": 0 } }'></div>
+    </div>
+
+    <div class="storage-group" data-name="chargerpower">
+        <div class="storage-item" data-name="source" data-value="electrical.chargers.257.power"></div>
+        <div class="storage-item" data-name="filter" data-value="multiply"></div>
+        <div class="storage-item" data-name="units" data-value='["kW","W"]'></div>
+   	    <div class="storage-item" data-name="scales" data-value='{ "kW": { "min": 0, "max": 10, "ticks": 10, "factor": 0.001, "offset": 0, "places": 1 }, "W": { "min": 0, "max": 10000, "ticks": 10, "factor": 1.0, "offset": 0, "places": 0 } }'></div>
+    </div>
+
+    <div class="storage-group" data-name="waste">
+        <div class="storage-item" data-name="source" data-value="tanks.wasteWater.0.currentLevel"></div>
+        <div class="storage-item" data-name="filter" data-value="multiply"></div>
+    	<div class="storage-item" data-name="units" data-value='["%","l","m3"]'></div>
+    	<div class="storage-item" data-name="scales" data-value='{ "%": { "min": 0, "max": 100, "ticks": 10, "factor": 100, "offset": 0, "places": 0 }, "l": { "min": 0, "max": 3000, "ticks": 15, "factor": 0.539957, "offset": 0, "places": 0 }, "m3": { "min": 0, "max": 3, "ticks": 15, "factor": 0.621371, "offset": 0, "places": 2 } }'></div>
+    </div>
+
+    <div class="storage-group" data-name="waterps">
+        <div class="storage-item" data-name="source" data-value="tanks.freshWater.1.currentLevel"></div>
+        <div class="storage-item" data-name="filter" data-value="multiply"></div>
+    	<div class="storage-item" data-name="units" data-value='["%","l","m3"]'></div>
+    	<div class="storage-item" data-name="scales" data-value='{ "%": { "min": 0, "max": 100, "ticks": 10, "factor": 100.0, "offset": 0, "places": 0 }, "l": { "min": 0, "max": 3000, "ticks": 15, "factor": 0.539957, "offset": 0, "places": 0 }, "m3": { "min": 0, "max": 3, "ticks": 15, "factor": 0.621371, "offset": 0, "places": 2 } }'></div>
+    </div>
+
+    <div class="storage-group" data-name="watersb">
+        <div class="storage-item" data-name="source" data-value="tanks.freshWater.2.currentLevel"></div>
+        <div class="storage-item" data-name="filter" data-value="multiply"></div>
+    	<div class="storage-item" data-name="units" data-value='["%","l","m3"]'></div>
+    	<div class="storage-item" data-name="scales" data-value='{ "%": { "min": 0, "max": 100, "ticks": 10, "factor": 100.0, "offset": 0, "places": 0 }, "l": { "min": 0, "max": 3000, "ticks": 15, "factor": 0.539957, "offset": 0, "places": 0 }, "m3": { "min": 0, "max": 3, "ticks": 15, "factor": 0.621371, "offset": 0, "places": 2 } }'></div>
+    </div>
+
+    <div class="storage-group" data-name="fuelps">
+        <div class="storage-item" data-name="source" data-value="tanks.fuel.3.currentLevel"></div>
+        <div class="storage-item" data-name="filter" data-value="multiply"></div>
+    	<div class="storage-item" data-name="units" data-value='["%","l","m3"]'></div>
+    	<div class="storage-item" data-name="scales" data-value='{ "%": { "min": 0, "max": 100, "ticks": 10, "factor": 100.0, "offset": 0, "places": 0 }, "l": { "min": 0, "max": 3000, "ticks": 15, "factor": 0.539957, "offset": 0, "places": 0 }, "m3": { "min": 0, "max": 3, "ticks": 15, "factor": 0.621371, "offset": 0, "places": 2 } }'></div>
+    </div>
+
+    <div class="storage-group" data-name="fuelsb">
+        <div class="storage-item" data-name="source" data-value="tanks.fuel.4.currentLevel"></div>
+        <div class="storage-item" data-name="filter" data-value="multiply"></div>
+    	<div class="storage-item" data-name="units" data-value='["%","l","m3"]'></div>
+    	<div class="storage-item" data-name="scales" data-value='{ "%": { "min": 0, "max": 100, "ticks": 10, "factor": 100.0, "offset": 0, "places": 0 }, "l": { "min": 0, "max": 3000, "ticks": 15, "factor": 0.539957, "offset": 0, "places": 0 }, "m3": { "min": 0, "max": 3, "ticks": 15, "factor": 0.621371, "offset": 0, "places": 2 } }'></div>
+    </div>
+
+</div>

@@ -1,19 +1,16 @@
 class FunctionFactory {
 
-    static getFilter(fspec = { "name": "identity" }) {
-        //console.log("FunctionFactory.getFilter(%s)...", JSON.stringify(fspec));
+    static getFilter(name="identity", context) {
+        //console.log("FunctionFactory.getFilter(%s,%s)...", name, context);
 
-        var retval = undefined;
-        
-        try {
-            if (fspec["name"]) {
-                retval = FunctionFactory.filters[fspec.name](fspec);
-            }
-        } catch {
-            console.log("error parsing filter specification %s", fspec);
-        }
-        return(retval);    
+        return(FunctionFactory.filters[name](context));
     }
+
+    static percent(v, min, max) {
+        v = Math.round(((v - min) / (max - min)) * 100);
+        return((v < 0)?0:((v > 100)?100:v)); 
+    }
+
 
     static degToDMS(v, args={ "hemis": ["N", "S"] }) {  
         var h = args["hemis"][(v >= 0)?0:1];
@@ -29,121 +26,50 @@ class FunctionFactory {
         return ("" + ("00" + d).slice(-3) + '&deg;' + ("0" + m).slice(-2) + '\'' + ("0" + s).slice(-2) + '.' + ds + '"' + h);  
     }
 
-    static resolveValues(args) {
-        var values = {};
-        Object.keys(args).filter(name => (name != "name")).forEach(name => {
-            if (!name.includes("!")) {
-                var value = args[name];
-                if (value !== undefined) value = (("" + value).includes("!"))?PageUtils.getStorageItem(value):value;
-                values[name] = value;
-            } else {
-                var nameparts = name.split("!");
-                values[nameparts[1]] = PageUtils.getStorageItem(name, args[name]);
-            }
+    static decodeContext(context) {
+        var retval = {};
+        var parts = context.split(";");
+        parts.forEach(part => {
+            var obj = {};
+            try { obj = JSON.parse(part); } catch(e) { obj = LocalStorage.getAllItems(part); }
+            Object.keys(obj).forEach(key => { retval[key] = obj[key]; });
         });
-        return(values);
+        Object.keys(retval).forEach(key => {
+            if (retval[key].startsWith('#')) retval[key] = document.getElementById(retval[key].substr(1)).innerHTML;
+        });
+        return(retval);
     }
-        
-        
-
 
     static filters = {
 
-        "sog":                  function(args={}) {
-                                    var args = args;
+        "multiply":             function(parameters) {
+                                    var parameters = parameters;
                                     return(
                                         function(v) {
-                                            var v = parseFloat(v);
-                                            var _args = FunctionFactory.resolveValues(args);
-                                            var retval = v;
-                                            switch (_args.units) {
-                                                case "kts": retval = (v * 0.539957); break;
-                                                case "mph": retval = (v * 0.621371); break;
-                                                case "mps": retval = (v * 0.277778); break;
-                                                default: break;
-                                            }
-                                            return(retval.toFixed(parseInt(_args.places)));
+                                            var factor = parameters.getParameter("factor");
+                                            var offset = parameters.getParameter("offset");
+                                            var places = parameters.getParameter("places");
+                                            return(((v * factor) + offset).toFixed(places));
                                         }
                                     );
                                 },
 
-        "depth":                function(args={}) {
-                                    var args = args;
+        "multiplyPercent":      function(parameters) {
+                                    var parameters = parameters;
                                     return(
                                         function(v) {
-                                            var v = parseFloat(v);
-                                            var _args = FunctionFactory.resolveValues(args);
-                                            var units = _args.units;
-                                            var places = parseInt(_args.places);
-                                            var retval = v;
-                                            switch (units) {
-                                                case "ft": retval = (v * 3.28084); break;
-                                                case "ftm": retval = (v * 0.546807); break;
-                                                default: break;
-                                            }
-                                            return((Math.round(retval * (10 * places)) / (10 * places)).toFixed(places));
+                                            v = (FunctionFactory.getFilter("multiply", parameters))(v);
+                                            var min = parameters.getParameter("min");
+                                            var max = parameters.getParameter("max"); 
+                                            return(FunctionFactory.percent(v, min, max));
                                         }
                                     );
                                 },
 
-        "percent":              function(args={}) {
-                                    var args = args;
+        "getValue":             function(context) {
                                     return(
                                         function(v) {
-                                            var v = parseFloat(v);
-                                            var _args = FunctionFactory.resolveValues(args);
-                                            var min = parseFloat(_args.min);
-                                            var max = parseFloat(_args.max);
-                                            var invert = parseInt(_args.invert);
-                                            var retval = v;
-                                            retval = Math.round((v / (max - min)) * 100);
-                                            retval = (retval < 0)?0:((retval > 100)?100:retval); 
-                                            return((args.invert)?(100 - retval):retval); 
-                                        }
-                                    );
-                                },
-
-        "rateOfTurn":           function(args={}) {
-                                    var args = args;
-                                    return(
-                                        function(v) {
-                                            var v = parseFloat(v);
-                                            var _args = FunctionFactory.resolveValues(args);
-                                            var retval = parseFloat(v);
-                                            return((Math.abs(v * 57.2958) * 60).toFixed(parseInt(_args.places)));
-                                        }
-                                    );
-                                },
-
-        "rateOfTurnPercent":    function(args={}) {
-                                    var args = args;
-                                    return(
-                                        function(v) {
-                                            var v = parseFloat(v);
-                                            var _args = FunctionFactory.resolveValues(args);
-                                            return(Math.round((((v * 57.2958 * 60) / (parseFloat(_args.max) - parseFloat(_args.min))) * 100) + 50));
-                                        }
-                                    );
-                                },
-
-        "rudderAngle":          function(args={}) {
-                                    var args = args;
-                                    return(
-                                        function(v) {
-                                            var v = parseFloat(v);
-                                            var _args = FunctionFactory.resolveValues(args);
-                                            return(Math.abs(v * 57.2958).toFixed(parseInt(_args.places)));
-                                        }
-                                    );
-                                },
-
-        "rudderPercent":        function(args={}) {
-                                    var args = args;
-                                    return(
-                                        function(v) {
-                                            var v = parseFloat(v);
-                                            var _args = FunctionFactory.resolveValues(args);
-                                            return((((v * 57.2958) / (parseFloat(_args.max) - parseFloat(_args.min))) * 100) + 50);
+                                            return(v.value);
                                         }
                                     );
                                 },
@@ -167,118 +93,40 @@ class FunctionFactory {
                                     );
                                 },
 
-        "temperature":          function(args={}) {
-                                    var args = args;
-                                    return(
-                                        function(v) {
-                                            v = parseFloat(v);
-                                            var _args = FunctionFactory.resolveValues(args);
-                                            var units = _args.units;
-                                            var places = _args.places;
-                                            switch (units) {
-                                                case "C": retval = ((v -273) / 10); break;
-                                                case "K": retval = (v / 10); break;
-                                                default: retval = v; break;
-                                            }
-                                            return(retval.toFixed(places));
-                                        }
-                                    );
-                                },
-
-        "getfield":             function(args={}) {
-                                    var fname = (args.fname)?args.fname:"value";
-                                    return(
-                                        function(v) {
-                                            return((typeof v === "object")?v[fname]:v);
-                                        }
-                                    );
-                                },
-
         "notification":         function(args={}) {
                                     var level = (args.level)?args.level:"alert";
                                     return(
                                         function(v) {
-                                            console.log(JSON.stringify(v));
                                             return((v.state == level)?v.message:null);
                                         }
                                     );
                                 },
 
-        "identity":             function(args={}) {
-                                    var places = (args.places)?args.places:undefined;
-                                    var pad = (args.pad)?args.pad:undefined;
+        "identity":             function(context) {
                                     return(
                                         function(v) {
-                                            if (typeof v === "number") {
-                                                if (places) v = v.toFixed(places);
-                                                if (pad) while (("" + v).length < pad) v = " " + v;
-                                            }
-                                            return(v);
+                                            return((typeof v === "string")?v.trim():v);
                                         }
                                     );
                                 },
 
-        "getDate":              function(args={}) {
+        "date":                 function(context) {
                                     return(
                                         function(v) {
                                             return(v.substr(0, v.indexOf('T')));
                                         }
-                                    ); 
+                                    );
                                 },
 
-        "getTime":              function(args={}) {
+        "time":                 function(context) {
                                     return(
                                         function(v) {
                                             return(v.substr(v.indexOf('T')+1));
                                         }
-                                    ); 
-                                },
-
-        "multiply":             function(args={}) {
-                                    var factor = (args.factor)?args.factor:1;
-                                    var places = (args.places)?args.places:0;
-                                    return(
-                                        function(v) {
-                                            if ((typeof factor === "string") && factor.startsWith('#')) {
-                                                var e = document.getElementById(factor.substring(1));
-                                                if (e) factor = parseInt(e.textContent);
-                                            }
-                                            return((v * factor).toFixed(places));
-                                        }
-                                    ); 
-                                },
- 
-        "offset":               function(args={}) {
-                                    var offset = (args.offset)?args.offset:0;
-                                    var places = (args.places)?args.places:0;
-                                    return(
-                                        function(v) {
-                                            return((Number(v) + offset).toFixed(places));
-                                        }
                                     );
                                 },
 
-
-        "temperaturePercent":   function(args={}) {
-                                    var min = (args.length > 0)?args[0]:273;
-                                    var max = (args.length > 1)?args[1]:313;
-                                    return(
-                                        function(v) {
-                                            v = Math.round(((Number(v) - min) / (max - min)) * 10);
-                                            return((v < 0)?0:((v > 100)?100:v));
-                                        }
-                                    );
-                                },
-
-        "toDegrees":            function(args={}) {
-                                    return(
-                                        function(v) {
-                                            return(("00" + (Math.round(v * 57.2958) % 360)).slice(-3));
-                                        }
-                                    );
-                                },
-
-        "toLatitude":           function(args={}) {
+        "latitude":             function(context) {
                                     return(
                                         function({ latitude, longitude }) {
                                             return(FunctionFactory.degToDMS(latitude, { "hemis": ['N','S'] })); 
@@ -286,10 +134,19 @@ class FunctionFactory {
                                     );
                                 },
 
-        "toLongitude":          function(args={}) {
+        "longitude":            function(context) {
                                     return(
                                         function({ latitude, longitude }) {
                                             return(FunctionFactory.degToDMS(longitude, { "hemis": ['E','W'] })); 
+                                        }
+                                    );
+                                },
+
+        "degrees":              function(context) {
+                                    var context = context;
+                                    return(
+                                        function(v) {
+                                            return(("00" + (Math.round(v * 57.2958) % 360)).slice(-3));
                                         }
                                     );
                                 },
