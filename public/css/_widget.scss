@@ -47,37 +47,6 @@
     100% { opacity: 1; }
 }
 
-.table {
-    display: table;
-    table-layout: fixed;
-    width: 100%;
-    /*height: 100%;*/
-}
-
-.table-row-group {
-    display: table-row-group;
-}
-
-.table-row {
-    display: table-row;
-    height: 100%;
-}
-.switch .table-row {
-    @extend .w3-theme-d1
-}
-.relay .table-row {
-    @extend .w3-theme-d1
-}
-
-.table-cell {
-    display: table-cell;
-    position: relative;
-}
-
-.table-cell.widget-indicator {
-    padding: 2px;
-}
-
 .popup-parent .popup {
     display: none;
 }
@@ -168,11 +137,9 @@ span.clear::before {
   justify-content: center; }
 
 #overlay-container {
-  display: table;
+  display: inline-block;
   position: relative;
   z-index: 10;
-  width: 100%;
-  height: 100%;
 }
 
 #overlay-chart {
@@ -228,17 +195,24 @@ span.clear::before {
   pointer-events: none; }
 
 .widget-indicator {
-  /*background-color: gray;*/
+  background-color: gray;
   height: 5px;
   width: 100%;
 }
 
 .relay .widget-indicator {
-    /*width: 10px !important;*/
+    width: 10px !important;
 }
 
 .switch .widget-indicator {
-    /*width: 3.5px !important;*/
+    width: 3.5px !important;
+}
+
+.widget-gauge {
+    position: relative;
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
 }
 
 .widget-hgauge-label .widget-hgauge-grid {

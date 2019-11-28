@@ -1,0 +1,135 @@
+<html>
+    <head>
+	    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	    <script type="text/javascript" src="lib/Parameters.js"></script>
+	    <script type="text/javascript" src="lib/LocalStorage.js"></script>
+	    <script type="text/javascript" src="lib/pageutils.js"></script>
+	    <script type="text/javascript" src="lib/signalk.js"></script>
+	    <script type="text/javascript" src="lib/FunctionFactory.js"></script>
+	    <script type="text/javascript" src="lib/WidgetComponent.js"></script>
+	    <script type="text/javascript" src="lib/Widget.js"></script>
+	    <script type="text/javascript" src="lib/script.js"></script>
+	    <link rel="stylesheet" type="text/css" href="css/style.css">
+        <title>Tank Levels</title>
+        <style type="text/css">
+        html, body {
+            background: black
+        }
+        p, h1, h2, h3 {
+            margin-top: 1em;
+        }
+        pre {
+            display: inline;
+            white-space: pre-line;
+            word-wrap: break-word;
+        }
+            .widget-cursor {
+                background: grey;
+                opacity: 0.5;
+            }
+            .widget-text-cell {
+                vertical-align: top;
+                padding-top: 20px;
+            }
+            .widget-text-cell span::before {
+                content: "\A";
+                white-space: pre;
+            }
+            .widget-scale {
+                position: absolute;
+                bottom: 0px;
+                height: 100%;
+                width: 100%;
+            }
+            .widget-scale-tick {
+                position: absolute;
+                width: 90%;
+                margin-left: 5%;
+                bottom: 0px;
+                border-top: 1px dashed grey;
+            }
+            .table {
+                height: 100%;
+            }
+            .table-cell {
+                height: 100%;
+            }
+        </style>
+    </head>
+    <body onload="init();">
+        <div class="lcars-app-container">
+            <div id="header" class="lcars-row header">
+                <div class="lcars-elbow left-bottom"></div>
+                <div class="lcars-bar lcars-u-1 horizontal both-divider">FUEL PS</div>
+                <div class="lcars-bar horizontal lcars-p-1"></div>
+                <div class="lcars-bar lcars-u-1 horizontal both-divider">FUEL SB</div>
+                <div class="lcars-bar horizontal lcars-p-1"></div>
+                <div class="lcars-bar lcars-u-1 horizontal both-divider">WATER PS</div>
+                <div class="lcars-bar horizontal lcars-p-1"></div>
+                <div class="lcars-bar lcars-u-1 horizontal both-divider">WATER SB</div>
+                <div class="lcars-bar horizontal lcars-p-1"></div>
+                <div class="lcars-bar lcars-u-1 horizontal both-divider">WASTE</div>
+                <div class="lcars-bar horizontal lcars-p-1"></div>
+                <div class="lcars-bar horizontal right-end decorated" onClick="Overlay.createOverlay(AlertEditor.createAlertEditor)"></div>
+            </div>
+            <div class="lcars-row">
+            <div id="left-menu" class="lcars-column start-space lcars-u-1">
+                <div class="lcars-bar"></div>
+            </div>
+            <div id="container" style="overflow: hidden;">
+                <div class="lcars-row">
+                <div class="lcars-bar lcars-u-1 horizontal both-divider" style="height: 400px;">FUEL PS</div>
+                <div class="lcars-bar horizontal lcars-p-1"></div>
+                <div class="lcars-bar lcars-u-1 horizontal both-divider">FUEL SB</div>
+                <div class="lcars-bar horizontal lcars-p-1"></div>
+                <div class="lcars-bar lcars-u-1 horizontal both-divider">WATER PS</div>
+                <div class="lcars-bar horizontal lcars-p-1"></div>
+                <div class="lcars-bar lcars-u-1 horizontal both-divider">WATER SB</div>
+                <div class="lcars-bar horizontal lcars-p-1"></div>
+                <div class="lcars-bar lcars-u-1 horizontal both-divider">WASTE</div>
+                <div class="lcars-bar horizontal lcars-p-1"></div>
+                </div>
+            </div>
+<!--
+        <div class="table">
+            
+            <div class="table-cell">
+                <div id="T4-CAPACITY" class="signalk-static" style="display: none;" data-signalk-path="tanks.fuel.4.capacity" data-filter="getValue"></div>
+                <div class="vertical widget-gauge" data-parameters='fuelps'></div> 
+                <div class="vertical widget-text" data-parameters='fuelps;{ "factor": "#T4-CAPACITY" }' style="opacity: 0.3">
+                    FUEL PS --- litres
+                </div>
+            </div>
+            <div class="table-cell">
+                <div id="T3-CAPACITY" class="signalk-static" style="display: none;" data-signalk-path="tanks.fuel.3.capacity" data-filter="getValue"></div>
+                <div class="vertical widget-gauge" data-parameters="fuelsb"></div>
+                <div class="vertical widget-text" data-parameters='fuelsb;{ "factor": "#T3-CAPACITY" }' style="opacity: 0.3">
+                    FUEL SB --- litres
+                </div>
+            </div>
+            <div class="table-cell">
+                <div id="T1-CAPACITY" class="signalk-static" style="display: none;" data-signalk-path="tanks.freshWater.1.capacity" data-filter="getValue"></div>
+                <div class="vertical widget-gauge" data-parameters="waterps"></div>
+                <div class="vertical widget-text" data-parameters='waterps;{ "factor": "#T1-CAPACITY" }' style="opacity: 0.3">
+                    WATER PS --- litres
+                </div>
+            </div>
+            <div class="table-cell">
+                <div id="T2-CAPACITY" class="signalk-static" style="display: none;" data-signalk-path="tanks.freshWater.2.capacity" data-filter="getValue"></div>
+                <div class="vertical widget-gauge" data-parameters="watersb"></div> 
+                <div class="vertical widget-text" data-parameters='watersb;{ "factor": "#T2-CAPACITY" }' style="opacity: 0.3">
+                    WATER SB --- litres
+                </div>
+            </div>
+            <div class="table-cell">
+                <div id="T0-CAPACITY" class="signalk-static" style="display: none;" data-signalk-path="tanks.wasteWater.0.capacity" data-filter="getValue"></div>
+                <div class="vertical widget-gauge" data-parameters="waste"></div> 
+                <div class="vertical widget-text" data-parameters='waste;{ "factor": "#T0-CAPACITY" }' style="opacity: 0.3">
+                    WASTE --- litres
+                </div>
+            </div>
+        </div>
+        </div>
+        </div>
+    </body>
+</html>

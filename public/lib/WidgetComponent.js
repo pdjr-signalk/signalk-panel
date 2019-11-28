@@ -42,27 +42,18 @@ class WidgetComponent {
         if (this.updateFunction !== undefined) this.updateFunction(value);
     }
 
-    resolveValue(name, args, fallback) {
-        //console.log("resolveValue(%s,%s,%s)...", name, JSON.stringify(args), fallback);
-
-        var retval = fallback;
-        var key = Object.keys(args).reduce((a,v) => { return((v.includes("!" + name))?v:a); }, undefined);
-
-        if (key) {
-            retval = PageUtils.getStorageItem(key, args[key]);
-        } else {
-            retval = args[name];
-        }
-        return(retval);
+    resetAnimation(element) {
+        element.style.animation = 'none';
+        element.offsetHeight; /* trigger reflow */
+        element.style.animation = null; 
     }
-            
 
 }
 
 class AlertComponent extends WidgetComponent {
 
     constructor(parentNode, parameters, getFilterFunction) {
-        console.log("AlertComponent(%s,%s)...", parentNode, JSON.stringify(parameters));
+        //console.log("AlertComponent(%s,%s)...", parentNode, JSON.stringify(parameters));
 
         super(parentNode, parameters, getFilterFunction);
 
@@ -159,14 +150,17 @@ class CursorComponent extends WidgetComponent {
         super.tree = div;
 
         var func = filterFunction(parameters.getParameter("filter") + "Percent", parameters);
+        var funcra = super.resetAnimation;
         if (func) {
             if (direction == "horizontal") {
                 super.updateFunction = function(v) {
                     div.style.width = func(v) + "%";
+                    funcra(div);
                 };
             } else {
                 super.updateFunction = function(v) {
                     div.style.height = func(v) + "%";
+                    funcra(div);
                 };
             }
         }
@@ -186,7 +180,7 @@ class TextComponent extends WidgetComponent {
         var table  = document.createElement("div");
         table.className = "widget-component widget-text";
         var cell = document.createElement("div");
-        cell.className = "widget-text-cell";
+        cell.className = "widget-text-cell timeout";
         table.appendChild(cell);
         var span = document.createElement("span");
         span.innerHTML = "???";
@@ -197,10 +191,12 @@ class TextComponent extends WidgetComponent {
         super.tree = table;
 
         var func = filterFunction(parameters.getParameter("filter"), parameters);
+        var rafunc = super.resetAnimation;
         if (func) {
             super.updateFunction = function(v) {
                 v = func(v);
                 span.innerHTML = (v.startsWith("-"))?v.substr(1):v;
+                rafunc(cell);
             };
         }
     }
@@ -210,7 +206,7 @@ class TextComponent extends WidgetComponent {
 class IndicatorComponent extends WidgetComponent {
 
     constructor(parentNode, parameters, filterFunction) {
-        console.log("IndicatorComponent(%s,%s)...", parentNode, JSON.stringify(parameters));
+        //console.log("IndicatorComponent(%s,%s)...", parentNode, JSON.stringify(parameters));
 
         super(parentNode, parameters, filterFunction);
 
@@ -221,7 +217,7 @@ class IndicatorComponent extends WidgetComponent {
         var notification = parentNode.innerHTML.includes("---");
 
         var div = document.createElement("div");
-        div.className = "widget-component " + ((notification)?"widget-notification":"widget-indicator");
+        div.className = "animatebg widget-component " + ((notification)?"widget-notification":"widget-indicator");
         var span = document.createElement("span"); 
         span.innerHTML = "";
         var found = parentNode.innerHTML.match(/(.*)---(.*)/);
@@ -232,6 +228,7 @@ class IndicatorComponent extends WidgetComponent {
 
         if (parameters.getParameter("filter") !== undefined) {
             var func = filterFunction(parameters.getParameter("filter"));
+            var rafunc = super.resetAnimation;
             if (func) {
                 super.updateFunction = function(v) {
                     if (func(v)) {
