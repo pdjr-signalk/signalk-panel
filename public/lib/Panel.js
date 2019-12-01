@@ -1,14 +1,11 @@
-// Initialise page immediately it has loaded.
-//
-var HOSTS = [ [ location.hostname, location.port ], [ "www.pdjr.eu", 3000 ] ]
+class Panel extends SignalK {
 
-function init(localinit) {
-    // Stop the browser from displaying the right-click context menu.
-    document.addEventListener("contextmenu", (e) => { contextHandler(e); e.preventDefault(); });
-    window.event.cancelBubble = true;
-    
-    var signalk = new SignalK(HOSTS[0][0], HOSTS[0][1],
-        function() {
+    static createPanel(container, host, port) {
+        return(new Panel(container, host, port));
+    }
+
+    constructor(container, host, port) {
+        super(host, port).waitForConnection().then(_ => {
             // Initialise page helper library
             var pageutils = new PageUtils({ "overlayOnLoad": function(r) { }});
 
@@ -25,14 +22,14 @@ function init(localinit) {
             PageUtils.walk(document, "signalk-static", element => {
                 var path = PageUtils.getAttributeValue(element, "data-signalk-path");
                 var filter = FunctionFactory.getFilter(PageUtils.getAttributeValue(element, "data-filter"));
-                signalk.interpolateValue(path, element, true, filter);
+                super.interpolateValue(path, element, true, filter);
             });
 
             // Populate page with dynamic values derived from Signal K server
             PageUtils.walk(document, "signalk-dynamic", element => {
                 var path = PageUtils.getAttributeValue(element, "data-signalk-path");
                 var filter = FunctionFactory.getFilter(PageUtils.getAttributeValue(element, "data-filter"));
-                signalk.registerCallback(path, function(v) { alert("Hello"); });
+                super.registerCallback(path, function(v) { alert("Hello"); });
             });
 
             // Populate page with widgets
@@ -40,20 +37,17 @@ function init(localinit) {
                 var widgetType = element.className.split(" ").reduce((a,v) => { return((v.startsWith("widget-"))?v.substr(7):undefined); }, undefined);
                 if (widgetType != undefined) {
                     if (element.hasAttribute("data-parameters")) {
-                        var params = Parameters.createParameters(element.getAttribute("data-parameters"));
-                        var source = params.getParameter("source");
+                        var params = Parameters.parse(element.getAttribute("data-parameters"));
+                        var source = Parameters.get(params, "source");
+                        var filter = Parameters.get(params, "filter");
                         if (source !== undefined) {
-                            signalk.registerCallback(source, Widget.createWidget(element, widgetType, params, WidgetComponent.createWidgetComponent, FunctionFactory.getFilter));
+                            super.registerCallback(source, Widget.createWidget(element, widgetType, params, FunctionFactory.getFilter(filter, params)));
                         }
                     } 
                 }
             });
-            if (localinit !== undefined) localinit(signalk);
-        },
-        function() {
-            HOSTS = HOSTS.splice(1);
-            if (HOSTS.length) init(localinit);        
-        }
-    );
+        });
+
+    }
 
 }

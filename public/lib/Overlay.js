@@ -51,6 +51,8 @@ class Overlay {
     }
 
     close() {
+        var iframe = document.getElementById("overlay-object");
+        if (iframe != null) iframe.contentWindow.close();
         this.closeCurrentSource();
         this.overlay.style.display = "none";
     }

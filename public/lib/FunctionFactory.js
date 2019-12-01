@@ -2,8 +2,8 @@ class FunctionFactory {
 
     static getFilter(name="identity", context) {
         //console.log("FunctionFactory.getFilter(%s,%s)...", name, context);
-
-        return(FunctionFactory.filters[name](context));
+        var retval = FunctionFactory.filters[name](context);
+        return((retval === undefined)?FunctionFactory.filters("identity", context):retval);
     }
 
     static percent(v, min, max) {
@@ -26,50 +26,29 @@ class FunctionFactory {
         return ("" + ("00" + d).slice(-3) + '&deg;' + ("0" + m).slice(-2) + '\'' + ("0" + s).slice(-2) + '.' + ds + '"' + h);  
     }
 
-    static decodeContext(context) {
-        var retval = {};
-        var parts = context.split(";");
-        parts.forEach(part => {
-            var obj = {};
-            try { obj = JSON.parse(part); } catch(e) { obj = LocalStorage.getAllItems(part); }
-            Object.keys(obj).forEach(key => { retval[key] = obj[key]; });
-        });
-        Object.keys(retval).forEach(key => {
-            if (retval[key].startsWith('#')) retval[key] = document.getElementById(retval[key].substr(1)).innerHTML;
-        });
-        return(retval);
-    }
-
     static filters = {
 
-        "multiply":             function(parameters) {
-                                    var parameters = parameters;
+        "multiply":             function(params) {
+                                    var params = params;
                                     return(
                                         function(v) {
-                                            var factor = parameters.getParameter("factor");
-                                            var offset = parameters.getParameter("offset");
-                                            var places = parameters.getParameter("places");
-                                            return(((v * factor) + offset).toFixed(places));
+                                            v = (v == null)?0:v;
+                                            var factor = Parameters.get(params, "factor", parseFloat);
+                                            var offset = Parameters.get(params, "offset", parseFloat);
+                                            var places = Parameters.get(params, "places", parseInt);
+                                            return(((parseFloat(v) * factor) + offset).toFixed(places));
                                         }
                                     );
                                 },
 
-        "multiplyPercent":      function(parameters) {
-                                    var parameters = parameters;
+        "multiplyPercent":      function(params) {
+                                    var params = params;
                                     return(
                                         function(v) {
-                                            v = (FunctionFactory.getFilter("multiply", parameters))(v);
-                                            var min = parameters.getParameter("min");
-                                            var max = parameters.getParameter("max"); 
+                                            v = (FunctionFactory.getFilter("multiply", params))(v);
+                                            var min = parseFloat((params.min !== undefined)?params.min:0);
+                                            var max = parseFloat((params.max !== undefined)?params.max:100); 
                                             return(FunctionFactory.percent(v, min, max));
-                                        }
-                                    );
-                                },
-
-        "getValue":             function(context) {
-                                    return(
-                                        function(v) {
-                                            return(v.value);
                                         }
                                     );
                                 },
@@ -102,7 +81,7 @@ class FunctionFactory {
                                     );
                                 },
 
-        "identity":             function(context) {
+        "identity":             function(params) {
                                     return(
                                         function(v) {
                                             return((typeof v === "string")?v.trim():v);

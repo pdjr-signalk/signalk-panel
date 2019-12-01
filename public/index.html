@@ -9,14 +9,24 @@
 	<script type="text/javascript" src="lib/Overlay.js"></script>
 	<script type="text/javascript" src="lib/Widget.js"></script>
 	<script type="text/javascript" src="lib/WidgetComponent.js"></script>
-	<script type="text/javascript" src="lib/AlertEditor.js"></script>
 	<script type="text/javascript" src="lib/pageutils.js"></script>
-	<script type="text/javascript" src="lib/signalk.js"></script>
-	<script type="text/javascript" src="lib/script.js"></script>
+	<script type="text/javascript" src="lib/SignalK.js"></script>
+	<script type="text/javascript" src="lib/Panel.js"></script>
 	<link rel="stylesheet" type="text/css" href="css/style.css">
-	<title>signalk-panel</title>
+	<title>SignalK Panel</title>
+    <script>
+        function noRightClick() {
+            document.addEventListener("contextmenu", (e) => { contextHandler(e); e.preventDefault(); });
+            window.event.cancelBubble = true;
+        }
+    </script>
+    <style>
+    .widget-indicator-on {
+        background-color: orange;
+    }
+    </style>
 </head>
-<body onload="init();">
+<body onload="noRightClick(); Panel.createPanel(document.body, location.hostname, location.port);">
     <div data-include="config.html"></div>
     <div class="lcars-app-container">
 
@@ -32,11 +42,13 @@
             <div class="lcars-bar horizontal lcars-p-1"></div>
             <div data-include="includes/chargerpower.html"></div>
             <div class="lcars-bar horizontal lcars-p-1"></div>
+            <div data-include="includes/charge.html"></div>
+            <div class="lcars-bar horizontal lcars-p-1"></div>
             <div class="lcars-bar fill horizontal both-divider"></div>
             <div class="lcars-bar horizontal">
                 <div class="signalk-static lcars-title right" data-signalk-path="name"></div>
             </div>
-            <div class="lcars-bar horizontal right-end decorated" onClick="Overlay.createOverlay(AlertEditor.createAlertEditor)">
+            <div class="lcars-bar horizontal right-end decorated" onClick="Overlay.createOverlay(['includes/overlays/alerteditor/alerteditor.html'])">
             </div>
         </div>
 
@@ -69,6 +81,8 @@
             <div data-include="includes/waste.html"></div>
             <div class="lcars-bar horizontal bottom lcars-p-1"></div>
             <div data-include="includes/notification.html"></div>
+            <div data-include="includes/ignition.html"></div>
+            <div data-include="includes/lube.html"></div>
             <div class="lcars-bar horizontal right-end left-divider bottom" onClick="localStorage.clear(); location.reload();"></div>
         </div>
 

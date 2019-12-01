@@ -29,6 +29,14 @@ class LocalStorage {
                 retval[key.split(".")[1]] = value;
             }
         });
+        if (retval.units != undefined) {
+            retval.unit = retval.units[0];
+            if (retval.scales !== undefined) {
+                Object.keys(retval.scales[retval.unit]).forEach(key => {
+                    retval[key] = retval.scales[retval.unit][key];
+                });
+            }
+        }
         return(retval);
     }
 

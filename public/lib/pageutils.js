@@ -6,6 +6,28 @@ class PageUtils {
         PageUtils.overlays = [];
 	}
 
+    static createElement(type, id, classname, content, parentNode) {
+        var retval = document.createElement(type);
+        if (retval) {
+            if (id) retval.id = id;
+            if (classname) retval.className = classname;
+            if (content) retval.innerHTML = content;
+        }
+        if (parentNode) parentNode.appendChild(retval);
+        return(retval);
+    }
+ 
+    static waitFor(conditionFunction, timeout=500) {
+        const poll = resolve => {
+            if (conditionFunction()) {
+                resolve();
+            } else {
+                setTimeout(_ => poll(resolve), timeout);
+            }
+        }
+        return new Promise(poll);
+    }
+
     /**
      * Return the value associated with <name> from local storage.  If the
      * named value is not defined then return <fallback> and create a new
@@ -14,7 +36,7 @@ class PageUtils {
      * param name - name of the storage item to be retrieved.
      * param fallback - value to be returned if the named item is not defined.
      */
- 
+
     static getStorageItem(name, fallback) {
         //console.log("getStorageItem(%s,%s)...", name, fallback);
 

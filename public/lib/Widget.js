@@ -1,47 +1,47 @@
 class Widget {
 
-    static createWidget(parentNode, type, parameters, createWidgetComponent, getFilter) {
-        return(new Widget(parentNode, type, parameters, createWidgetComponent, getFilter));
+    static createWidget(parentNode, type, params, filter) {
+        //console.log("createWidget(%s,%s,%s)...", parentNode, type, JSON.stringify(params)); 
+        return(new Widget(parentNode, type, params, filter));
     }
 
-    constructor(parentNode, type, parameters, createWidgetComponent, getFilter) {
-        //console.log("Widget(%s,%s,%s)...", parentNode, type, JSON.stringify(parameters)); 
+    constructor(parentNode, type, params, filter) {
+        //console.log("Widget(%s,%s,%s)...", parentNode, type, JSON.stringify(params)); 
 
         this.parentNode = parentNode;
         this.type = type;
-        this.parameters = parameters;
-        this.createWidgetComponent = createWidgetComponent;
-        this.getFilter = getFilter;
+        this.params = params;
+        this.filter = filter;
         this.components = [];
 
         switch (type) {
             case "alert":
-                this.components.push(createWidgetComponent(parentNode, "alert", parameters, getFilter));
+                this.components.push(WidgetComponent.createWidgetComponent(parentNode, "alert", params));
                 break;
             case "cursor":
-                this.components.push(createWidgetComponent(parentNode, "cursor", parameters, getFilter));
+                this.components.push(WidgetComponent.createWidgetComponent(parentNode, "cursor", params));
                 break;
             case "gauge":
-                this.components.push(createWidgetComponent(parentNode, "scale", parameters, getFilter));
-                this.components.push(createWidgetComponent(parentNode, "cursor", parameters, getFilter));
+                this.components.push(WidgetComponent.createWidgetComponent(parentNode, "scale", params));
+                this.components.push(WidgetComponent.createWidgetComponent(parentNode, "cursor", params));
                 break;
             case "indicator":
-                this.components.push(createWidgetComponent(parentNode, "indicator", parameters, getFilter));
+                this.components.push(WidgetComponent.createWidgetComponent(parentNode, "indicator", params));
                 break;
             case "scale":
-                this.components.push(createWidgetComponent(parentNode, "scale", parameters, getFilter));
+                this.components.push(WidgetComponent.createWidgetComponent(parentNode, "scale", params));
                 break;
             case "textgauge":
-                this.components.push(createWidgetComponent(parentNode, "text", parameters, getFilter));
-                this.components.push(createWidgetComponent(parentNode, "scale", parameters, getFilter));
-                this.components.push(createWidgetComponent(parentNode, "cursor", parameters, getFilter));
+                this.components.push(WidgetComponent.createWidgetComponent(parentNode, "text", params));
+                this.components.push(WidgetComponent.createWidgetComponent(parentNode, "scale", params));
+                this.components.push(WidgetComponent.createWidgetComponent(parentNode, "cursor", params));
                 break;
             case "text":
-                this.components.push(createWidgetComponent(parentNode, "text", parameters, getFilter));
+                this.components.push(WidgetComponent.createWidgetComponent(parentNode, "text", params));
                 break;
             case "textcursor":
-                this.components.push(createWidgetComponent(parentNode, "text", parameters, getFilter));
-                this.components.push(createWidgetComponent(parentNode, "cursor", parameters, getFilter));
+                this.components.push(WidgetComponent.createWidgetComponent(parentNode, "text", params));
+                this.components.push(WidgetComponent.createWidgetComponent(parentNode, "cursor", params));
                 break;
         }
 
@@ -61,7 +61,7 @@ class Widget {
 
         this.timestamp = Date().now;
         this.latest = value;
-        this.components.forEach(component => component.update(value));
+        this.components.forEach(component => component.update((this.filter !== undefined)?this.filter(value):value));
     }
 
 }

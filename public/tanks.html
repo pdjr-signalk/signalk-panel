@@ -4,11 +4,11 @@
 	    <script type="text/javascript" src="lib/Parameters.js"></script>
 	    <script type="text/javascript" src="lib/LocalStorage.js"></script>
 	    <script type="text/javascript" src="lib/pageutils.js"></script>
-	    <script type="text/javascript" src="lib/signalk.js"></script>
+	    <script type="text/javascript" src="lib/SignalK.js"></script>
 	    <script type="text/javascript" src="lib/FunctionFactory.js"></script>
 	    <script type="text/javascript" src="lib/WidgetComponent.js"></script>
 	    <script type="text/javascript" src="lib/Widget.js"></script>
-	    <script type="text/javascript" src="lib/script.js"></script>
+	    <script type="text/javascript" src="lib/Tanks.js"></script>
 	    <link rel="stylesheet" type="text/css" href="css/style.css">
         <title>Tank Levels</title>
         <style type="text/css">
@@ -22,65 +22,15 @@
             width: 100%;
             border-top: 1px solid lightblue;
         }
-        .widget-row .widget-bar {
-            height: 80vh !important;
-            min-height: 80vh !important;
+        .lcars_label {
+            text-align: left !important;
         }
-        .widget-row .lcars-p-1 {
-            height: 80vh !important;
-            min-height: 80vh !important;
-        }
-        .signalk-static {
-            display: none;
+        .table-header-group .table-cell {
+            content-align: center;
+            align: center;
         }
         </style>
     </head>
-    <body onload="init();">
-        <div id="T0-CAPACITY" class="signalk-static" data-signalk-path="tanks.wasteWater.0.capacity" data-filter="getValue"></div>
-        <div id="T1-CAPACITY" class="signalk-static" data-signalk-path="tanks.freshWater.1.capacity" data-filter="getValue"></div>
-        <div id="T2-CAPACITY" class="signalk-static" data-signalk-path="tanks.freshWater.2.capacity" data-filter="getValue"></div>
-        <div id="T3-CAPACITY" class="signalk-static" data-signalk-path="tanks.fuel.3.capacity" data-filter="getValue"></div>
-        <div id="T4-CAPACITY" class="signalk-static" data-signalk-path="tanks.fuel.4.capacity" data-filter="getValue"></div>
-        <div class="lcars-app-container" style="content-align: center;">
-            <div class="lcars-column">
-                <div class="lcars-row">
-                    <div class="lcars-bar lcars-u-1">FUEL PS</div>
-                    <div class="lcars-bar lcars-p-1"></div>
-                    <div class="lcars-bar lcars-u-1">FUEL SB</div>
-                    <div class="lcars-bar lcars-p-1"></div>
-                    <div class="lcars-bar lcars-u-1">WATER PS</div>
-                    <div class="lcars-bar lcars-p-1"></div>
-                    <div class="lcars-bar lcars-u-1">WATER SB</div>
-                    <div class="lcars-bar lcars-p-1"></div>
-                    <div class="lcars-bar lcars-u-1">WASTE</div>
-                </div>
-                <div class="lcars-row widget-row">
-                    <div class="lcars-bar lcars-u-1 widget-bar">
-                        <div class="vertical widget-gauge" data-parameters='fuelps'></div>
-                        <div class="widget-text" data-parameters='fuelps;{ "factor": "#T4-CAPACITY" }'>--- litres</div>
-                    </div>
-                    <div class="lcars-bar lcars-p-1"></div>
-                    <div class="lcars-bar lcars-u-1 widget-bar">
-                        <div class="vertical widget-gauge" data-parameters="fuelsb"></div>
-                        <div class="widget-text" data-parameters='fuelsb;{ "factor": "#T3-CAPACITY" }'>--- litres</div>
-                    </div>
-                    <div class="lcars-bar lcars-p-1"></div>
-                    <div class="lcars-bar lcars-u-1 widget-bar">
-                        <div class="vertical widget-gauge" data-parameters="waterps"></div>
-                        <div class="widget-text" data-parameters='waterps;{ "factor": "#T1-CAPACITY" }'>--- litres</div>
-                    </div>
-                    <div class="lcars-bar lcars-p-1"></div>
-                    <div class="lcars-bar lcars-u-1 widget-bar">
-                        <div class="vertical widget-gauge" data-parameters="watersb"></div> 
-                        <div class="widget-text" data-parameters='watersb;{ "factor": "#T2-CAPACITY" }'>--- litres</div>
-                    </div>
-                    <div class="lcars-bar lcars-p-1"></div>
-                    <div class="lcars-bar lcars-u-1 widget-bar">
-                        <div class="vertical widget-gauge" data-parameters="waste"></div> 
-                        <div class="widget-text" data-parameters='waste;{ "factor": "#T0-CAPACITY" }'>--- litres</div>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <body onload='Tanks.createTanks(document.body, location.hostname, location.port);'>
     </body>
 </html>

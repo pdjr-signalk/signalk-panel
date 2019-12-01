@@ -3092,7 +3092,6 @@ a.lcars-text-box.blink {
 .widget-notification.widget-indicator-on span {
   padding: 3px;
   background-color: orange;
-  animation: opacity 2s ease-in-out infinite;
   opacity: 1; }
 
 @keyframes opacity {
@@ -3423,6 +3422,9 @@ a.lcars-text-box, .lcars-element .lcars-element-addition, .alert-editor .table-r
   table-layout: auto;
   width: 100%; }
 
+.table.fixed {
+  table-layout: fixed; }
+
 .table-header-group {
   display: table-header-group;
   font-weight: bold; }
@@ -3479,5 +3481,8 @@ h5 {
 
 h6 {
   font-size: 140%; }
+
+.hidden {
+  display: none; }
 
 /*# sourceMappingURL=style.css.map */

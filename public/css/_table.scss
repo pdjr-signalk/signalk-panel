@@ -3,6 +3,9 @@
     table-layout: auto;
     width: 100%;
 }
+.table.fixed {
+    table-layout: fixed;
+}
 
 .table-header-group {
     display: table-header-group;

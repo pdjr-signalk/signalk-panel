@@ -1,18 +1,16 @@
-class Gnss {
+class Gnss extends SignalK {
 
-    static createGnss(parentNode, signalk) {
-        return(new Gnss(parentNode, signalk));
+    static createGnss(container, host, port) {
+        return(new Gnss(container, host, port));
     }
 
-    constructor(parentNode) {
-        this.parentNode = parentNode;
-        this.table = document.createElement("div"); this.table.className = "table"; this.parentNode.appendChild(this.table);
-        this.sources = {};
-        
-        var _this = this;
-        this.signalk = new SignalK([[location.hostname,location.port],["www.pdjr.eu",3000]], function(ws) {
-            _this.makeTableHeader(_this.table, [ "Receiver", "Last update", "Position", "Integrity", "Type of fix", "Quality", "PDOP|Position Dilution of Position", "HDOP|Horizontal Dilution of Position" ]);
-            _this.subscribe(_this.table, [ "navigation.position", "navigation.gnss.integrity", "navigation.gnss.type", "navigation.gnss.methodQuality", "navigation.gnss.positionDilution", "navigation.gnss.horizontalDilution" ]);
+    constructor(parentNode, host, port) {
+        super(host, port).waitForConnection().then(_ => {
+            this.parentNode = parentNode;
+            this.table = document.createElement("div"); this.table.className = "table"; this.parentNode.appendChild(this.table);
+            this.sources = {};
+            this.makeTableHeader(this.table, [ "Receiver", "Last update", "Position", "Integrity", "Type of fix", "Quality", "PDOP|Position Dilution of Position", "HDOP|Horizontal Dilution of Position" ]);
+            this.subscribe(this.table, [ "navigation.position", "navigation.gnss.integrity", "navigation.gnss.type", "navigation.gnss.methodQuality", "navigation.gnss.positionDilution", "navigation.gnss.horizontalDilution" ]);
         });
     }
 
@@ -36,7 +34,7 @@ class Gnss {
         paths.forEach(path => {
             var token = path.split(".").pop();
             var _this = this;
-            this.signalk.registerCallback(path, function(v) {
+            super.registerCallback(path, function(v) {
                 if (_this.sources[v.source] === undefined) _this.makeSource(group, v.source, paths);
                 _this.sources[v.source][token].innerHTML = (typeof v.value === "object")?"Received":v.value;
                 _this.sources[v.source][token].style.animation = 'none';
@@ -46,7 +44,7 @@ class Gnss {
                 _this.sources[v.source]["timestamp"].style.animation = 'none';
                 _this.sources[v.source]["timestamp"].offsetHeight; /* trigger reflow */
                 _this.sources[v.source]["timestamp"].style.animation = null; 
-            }, v=>v);
+            }, function(v) { return(v); });
         });
         container.appendChild(group);
     }

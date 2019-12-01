@@ -1,35 +1,29 @@
 class Parameters {
 
-    static createParameters(paramString) {
-        return(new Parameters(paramString));
-    }
-
-    constructor(paramString) {
-        //console.log("Parameters(%s)...", paramString);
-
-        this.paramString = paramString;
-        this.value = {};
+    static parse(string) {
+        //console.log("Parameters.parse(%s)...", string);
+        var retval = {};
     
-        var paramStringParts = paramString.split(";");
-        paramStringParts.forEach(part => {
-            var obj = {};
-            try { obj = JSON.parse(part); } catch(e) { obj = LocalStorage.getAllItems(part); }
-            Object.keys(obj).forEach(key => { this.value[key] = obj[key]; });
+        var parts = string.split(";");
+        var obj = {};
+        parts.forEach(part => {
+            if (part.charAt(0) == "!") {
+                obj = LocalStorage.getAllItems(part.substr(1));
+            } else {
+                obj = JSON.parse(part);
+            }
+            if (typeof obj === "object") Object.keys(obj).forEach(key => { retval[key] = obj[key]; });
         });
+        return(retval);
     }
 
-    getParamString() {
-        return(this.paramString);
-    }
-
-    getParameter(name, parser) {
-        //console.log("getParameter(%s,%s)...", name, parser);
-
-        var retval = this.value[name];
+    static get(params, name, parser) {
+        //console.log("Parameters.get(%s,%s,%s)...", JSON.stringify(params), name, parser);
+        var retval = params[name];
         if (retval !== undefined) {
             if ((typeof retval === "string") && (retval.charAt(0) == '#')) retval = document.getElementById(retval.substr(1)).innerHTML;
         } else {
-            if (this.value.scales !== undefined) retval = this.value.scales[this.value.units[0]][name];
+            console.log("requested parameter %s not found in %s", name, JSON.stringify(params));
         }
         return((parser !== undefined)?parser(retval):retval);
     }

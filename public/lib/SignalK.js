@@ -1,59 +1,59 @@
+/**
+ * Interface to Signal K server data streams.
+ *
+ * Applications deploying this class can extend the class using the following
+ * simple pattern:
+ *
+ * super(host, port).waitForConnection().then(_ => {
+ *     // do application specific stuff
+ * });
+ */
+
 class SignalK {
 
     /**
-     * Create a new SignalK object and associate it with a Signal K server.
-     *
-     * <host> is the hostname or IP address of the Signal K server.
-     *
-     * <port> is the port number on which the Signal K server listens.
-     *
+     * Create a new SignalK object and associate it with the Signal K server
+     * identified by <host>:<port>.  The constructor attempts to establish a
+     * connection ito the server asynchronously and will typically return
+     * before the putative connection is in a usable state.  The
+     * waitForConnection method can be used to manage this eventuality.
      */
-
-    constructor(hosts=[[ location.hostname, location.port ]], callback) {
+    constructor(host, port) {
         //console.log("SignalK(%s,%s,%s)...", JSON.stringify(hosts), getFilter);
-        this.hosts = hosts;
-        this.callback = callback;
+        this.host = host;
+        this.port = parseInt(port);
+
         this.ws = null;
         this.directory = {};
 
-		console.log("SignalK: opening websocket connection to " + this.hosts[0][0] + " on port " + this.hosts[0][1]);
-        var [ host, port ] = this.hosts.shift();
-       	this.ws = new WebSocket("ws://" + host + ":" + port + "/signalk/v1/stream?subscribe=none");
-
-        var _this = this;
-        this.ws.onopen = function(evt) { _this.onopen(evt); };
-        this.ws.onerror = function(evt) { this.onerror(evt); };
-        this.ws.onmessage = function(evt) { _this.onmessage(evt); };
-    }
-
-    onopen(evt) {
-	    console.log("SignalK: websocket connection established");
-        if (this.callback !== undefined) this.callback();
-    }
-
-    onerror(evt) {
-        console.log("SignalK: websocket connection failed.");
-        this.ws = null;
-        if (this.hosts.length > 0) {
-            var [ host, port ] = this.hosts.shift();
-            this.ws = new WebSocket("ws://" + host + ":" + port + "/signalk/v1/stream?subscribe=none");
-        }
-    }
-
-	onmessage(evt) {
-        //console.log("SignalK: websocket message received %s", JSON.stringify(evt.data));
-        var data = JSON.parse(evt.data);
-        if ((data.updates !== undefined) && (data.updates.length > 0)) data.updates.forEach(update => {
-            var source = update["$source"];
-            var timestamp = update["timestamp"];
-       	    if ((update.values !== undefined) && (update.values.length > 0)) update.values.forEach(updateValue => {
-       		    var path = updateValue.path;
-       		    var value = updateValue.value;
-       		    if ((path !== undefined) && (value !== undefined) && (this.directory[path] !== undefined)) {
-                    this.directory[path].forEach(callback => callback({ "source": source, "timestamp": timestamp, "value": value }));
+        if ((host !== undefined) && (port !== undefined)) {
+		    console.log("SignalK: opening websocket connection to %s on port %s", host, port);
+       	    this.ws = new WebSocket("ws://" + host + ":" + port + "/signalk/v1/stream?subscribe=none");
+            var _this = this;
+            this.ws.onopen = function(evt) { console.log("SignalK: websocket connection established"); }
+            this.ws.onerror = function(evt) { console.log("SignalK: websocket connection failed."); this.ws = null; }
+            this.ws.onmessage = function(evt) { 
+                //console.log("SignalK: websocket message received %s", JSON.stringify(evt.data));
+                var data = JSON.parse(evt.data);
+                if ((data.updates !== undefined) && (data.updates.length > 0)) {
+                    data.updates.forEach(update => {
+                        var source = update["$source"];
+                        var timestamp = update["timestamp"];
+   	                    if ((update.values !== undefined) && (update.values.length > 0)) {
+                            update.values.forEach(updateValue => {
+   		                        var path = updateValue.path;
+   		                        var value = updateValue.value;
+   		                        if ((path !== undefined) && (value !== undefined) && (_this.directory[path] !== undefined)) {
+                                    _this.directory[path].forEach(callback => callback({ "source": source, "timestamp": timestamp, "value": value }));
+                                }
+                            });
+                        }
+                    });
                 }
-            });
-        });
+            }
+        } else {
+            console.log("SignalK: invalid host specification");
+        }
     }
 
     /**
@@ -88,7 +88,7 @@ class SignalK {
 
             if (!this.directory[path].includes(callback)) {
                 this.directory[path].push(v => {
-                    if (_filter === undefined) v = v.value;
+                    v = (_filter !== undefined)?_filter(v):v.value;
                     switch (typeof _callback) {
                         case "object": _callback.update(v); break;
                         case "function": _callback(v); break;
@@ -114,7 +114,8 @@ class SignalK {
      */
 
     registerInterpolation(path, element, filter) {
-        this.registerCallback(path, function(v) { element.innerHTML = v; }, filter);
+        var _filter = filter;
+        this.registerCallback(path, function(v) { element.innerHTML = (_filter !== undefined)?_filter(v):v; });
     }
 
     deregisterCallback(path, callback) {
@@ -143,7 +144,7 @@ class SignalK {
     getObject(path, async, callback, filter) {
         this.httpGet(this.normalisePath(path), async, (v) => {
             v = JSON.parse(v);
-            callback(filter(v));
+            callback((filter !== undefined)?filter(v):v);
         });
     }
 
@@ -193,6 +194,13 @@ class SignalK {
         retval += parts[0].replace(/\./g, "/");
         if (parts[1] !== undefined) retval += ("[" + parts[1]);
         return(retval);
+    }
+
+    waitForConnection(timeout=500) {
+        const poll = resolve => {
+            if (this.ws.readyState === WebSocket.OPEN) { resolve(); } else { setTimeout(_ => poll(resolve), timeout); }
+        }
+        return new Promise(poll);
     }
 
 }

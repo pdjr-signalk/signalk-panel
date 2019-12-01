@@ -1,25 +1,25 @@
 class WidgetComponent {
 
-    static createWidgetComponent(parentNode, type, parameters, getFilterFunction) {
-        //console.log("createWidgetComponent(%s,%s,%s)...", parentNode, type, JSON.stringify(parameters));
+    static createWidgetComponent(parentNode, type, params) {
+        //console.log("createWidgetComponent(%s,%s,%s)...", parentNode, type, JSON.stringify(params));
 
         var retval = undefined;
 
         switch (type) {
             case "alert":
-                retval = new AlertComponent(parentNode, parameters, getFilterFunction);
+                retval = new AlertComponent(parentNode, params);
                 break;
             case "scale":
-                retval = new ScaleComponent(parentNode, parameters, getFilterFunction);
+                retval = new ScaleComponent(parentNode, params);
                 break;
             case "cursor":
-                retval = new CursorComponent(parentNode, parameters, getFilterFunction);
+                retval = new CursorComponent(parentNode, params);
                 break;
             case "text":
-                retval = new TextComponent(parentNode, parameters, getFilterFunction);
+                retval = new TextComponent(parentNode, params);
                 break;
             case "indicator":
-                retval = new IndicatorComponent(parentNode, parameters, getFilterFunction);
+                retval = new IndicatorComponent(parentNode, params);
                 break;
             default:
                 break;
@@ -28,8 +28,10 @@ class WidgetComponent {
         return(retval);
     }
 
-    constructor (parentNode, parameters, getFilterFunction) {
+    constructor(parentNode, params) {
         this.parentNode = parentNode;
+        this.params = params;
+
         this.tree = undefined;
         this.updateFunction = undefined;
     }
@@ -52,10 +54,10 @@ class WidgetComponent {
 
 class AlertComponent extends WidgetComponent {
 
-    constructor(parentNode, parameters, getFilterFunction) {
-        //console.log("AlertComponent(%s,%s)...", parentNode, JSON.stringify(parameters));
+    constructor(parentNode, params) {
+        //console.log("AlertComponent(%s,%s)...", parentNode, JSON.stringify(params));
 
-        super(parentNode, parameters, getFilterFunction);
+        super(parentNode, params);
 
         try {
 
@@ -78,11 +80,11 @@ class AlertComponent extends WidgetComponent {
             });
 
             var parentNode = parentNode;
-            var parameters = parameters;
+            var params = params;
             super.updateFunction = function(v) {
-                var test = parameters.getParameter("alert-test")[0];
-                var threshold = parameters.getParameter("alert-threshold", parseFloat);
-                var disabled = parameters.getParameter("alert-disabled", parseInt);
+                var test = params["alert-test"][0];
+                var threshold = parseFloat(params["alert-threshold"]);
+                var disabled = parseInt(params["alert-disabled"]);
                 var elems = document.getElementsByClassName(alertClass);
                 if (!disabled) {
                     if (((test == "lt") && (v < threshold)) || ((test == "eq") && (v == threshold)) || ((test == "gt") && (v > threshold))) {
@@ -103,31 +105,33 @@ class AlertComponent extends WidgetComponent {
 
 class ScaleComponent extends WidgetComponent {
 
-    constructor(parentNode, parameters) {
-        //console.log("ScaleComponent(%s,%s)...", parentNode, parameters);
+    constructor(parentNode, params) {
+        //console.log("ScaleComponent(%s,%s)...", parentNode, params);
 
-        super(parentNode, parameters);
+        super(parentNode, params);
 
         var direction = (parentNode.classList.contains("vertical"))?"vertical":"horizontal";
         var navigation = parentNode.classList.contains("navigation");
-        var selector = parameters.getParameter("units")[0];
-        var scale = parameters.getParameter("scales")[selector];
 
         var div = document.createElement("div");
         div.className = "widget-component widget-scale" + ((direction == "horizontal")?" widget-horizontal":" widget-vertical");
 
-        for (var i = 0; i <= scale.ticks; i++) {
+        var min = parseFloat(params.min) || 0;
+        var max = parseFloat(params.max) || 100;
+        var ticks = parseInt(params.ticks) || 10;
+
+        for (var i = 0; i <= ticks; i++) {
             var tick = document.createElement("div");
-            var tickValue = Number(scale.min) + (((scale.max - scale.min) / scale.ticks) * i);
+            var tickValue = Number(min) + (((max - min) / ticks) * i);
             tick.setAttribute("data-tick-value", Math.abs(tickValue));
             tick.className = "widget-scale-tick";
             if (navigation && (tickValue < 0)) tick.classList.add("port");
             if (navigation && (tickValue > 0)) tick.classList.add("starboard");
             
             if (direction == "horizontal") {
-                tick.style.width = ((i / scale.ticks) * 100) + "%";
+                tick.style.width = ((i / ticks) * 100) + "%";
             } else {
-                tick.style.height = ((i / scale.ticks) * 100) + "%";
+                tick.style.height = ((i / ticks) * 100) + "%";
             }
             div.appendChild(tick); 
         }
@@ -138,10 +142,10 @@ class ScaleComponent extends WidgetComponent {
 
 class CursorComponent extends WidgetComponent {
 
-    constructor(parentNode, parameters, filterFunction) {
-        //console.log("CursorComponent(%s,%s)...", parentNode, parameters);
+    constructor(parentNode, params) {
+        //console.log("CursorComponent(%s,%s)...", parentNode, params);
 
-        super(parentNode, parameters, filterFunction);
+        super(parentNode, params);
 
         var direction = (parentNode.classList.contains("vertical"))?"vertical":"horizontal";
 
@@ -149,20 +153,24 @@ class CursorComponent extends WidgetComponent {
         div.className = "widget-component widget-cursor " + ((direction == "horizontal")?"widget-horizontal":"widget-vertical");
         super.tree = div;
 
-        var func = filterFunction(parameters.getParameter("filter") + "Percent", parameters);
         var funcra = super.resetAnimation;
-        if (func) {
-            if (direction == "horizontal") {
-                super.updateFunction = function(v) {
-                    div.style.width = func(v) + "%";
-                    funcra(div);
-                };
-            } else {
-                super.updateFunction = function(v) {
-                    div.style.height = func(v) + "%";
-                    funcra(div);
-                };
-            }
+        var min = parseFloat(params.min) || 0;
+        var max = parseFloat(params.max) || 100; 
+        if (direction == "horizontal") {
+            super.updateFunction = function(v) {
+                v = Math.round(((v - min) / (max - min)) * 100);
+                v = ((v < 0)?0:((v > 100)?100:v)); 
+                div.style.width = v + "%";
+                funcra(div);
+            };
+        } else {
+            super.updateFunction = function(v) {
+                console.log(v);
+                v = Math.round(((v - min) / (max - min)) * 100);
+                v = ((v < 0)?0:((v > 100)?100:v)); 
+                div.style.height = v + "%";
+                funcra(div);
+            };
         }
     }
 
@@ -170,10 +178,10 @@ class CursorComponent extends WidgetComponent {
 
 class TextComponent extends WidgetComponent {
 
-    constructor(parentNode, parameters, filterFunction) {
-        //console.log("TextComponent(%s,%s)...", parentNode, parameters);
+    constructor(parentNode, params) {
+        //console.log("TextComponent(%s,%s)...", parentNode, params);
 
-        super(parentNode, parameters, filterFunction);
+        super(parentNode, params);
 
         var direction = (parentNode.classList.contains("vertical"))?"vertical":"horizontal";
 
@@ -190,14 +198,10 @@ class TextComponent extends WidgetComponent {
         if ((found) && (found.length >= 3)) cell.appendChild(document.createTextNode(found[2]));
         super.tree = table;
 
-        var func = filterFunction(parameters.getParameter("filter"), parameters);
         var rafunc = super.resetAnimation;
-        if (func) {
-            super.updateFunction = function(v) {
-                v = func(v);
-                span.innerHTML = (v.startsWith("-"))?v.substr(1):v;
-                rafunc(cell);
-            };
+        super.updateFunction = function(v) {
+            span.innerHTML = (v.charAt(0) == "-")?v.substr(1):v;
+            rafunc(cell);
         }
     }
 
@@ -205,42 +209,37 @@ class TextComponent extends WidgetComponent {
 
 class IndicatorComponent extends WidgetComponent {
 
-    constructor(parentNode, parameters, filterFunction) {
-        //console.log("IndicatorComponent(%s,%s)...", parentNode, JSON.stringify(parameters));
+    constructor(parentNode, params) {
+        //console.log("IndicatorComponent(%s,%s)...", parentNode, JSON.stringify(params));
 
-        super(parentNode, parameters, filterFunction);
+        super(parentNode, params);
 
-        var onclass = parameters.getParameter("onclass") || "widget-indicator-on";
-        var onvalue = parameters.getParameter("onvalue") || "";
-        var offclass = parameters.getParameter("offclass") || "widget-indicator-off";
-        var offvalue = parameters.getParameter("offvalue") || ""
+        var onclass = params.onclass || "widget-indicator-on";
+        var onvalue = params.onvalue || "";
+        var offclass = params.offclass || "widget-indicator-off";
+        var offvalue = params.offvalue || ""
         var notification = parentNode.innerHTML.includes("---");
 
         var div = document.createElement("div");
-        div.className = "animatebg widget-component " + ((notification)?"widget-notification":"widget-indicator");
-        var span = document.createElement("span"); 
-        span.innerHTML = "";
-        var found = parentNode.innerHTML.match(/(.*)---(.*)/);
-        if ((found) && (found.length >= 2)) div.appendChild(document.createTextNode(found[1]));
-        div.appendChild(span);
-        if ((found) && (found.length >= 3)) div.appendChild(document.createTextNode(found[2]));
+        div.className = "widget-component " + ((notification)?"widget-notification":"widget-indicator");
+        //var span = document.createElement("span"); 
+        //span.innerHTML = "";
+        //var found = parentNode.innerHTML.match(/(.*)---(.*)/);
+        //if ((found) && (found.length >= 2)) div.appendChild(document.createTextNode(found[1]));
+        //div.appendChild(span);
+        //if ((found) && (found.length >= 3)) div.appendChild(document.createTextNode(found[2]));
         super.tree = div;
 
-        if (parameters.getParameter("filter") !== undefined) {
-            var func = filterFunction(parameters.getParameter("filter"));
-            var rafunc = super.resetAnimation;
-            if (func) {
-                super.updateFunction = function(v) {
-                    if (func(v)) {
-                        if (notification) span.innerHTML = r;
-                        div.classList.remove(offclass);
-                        div.classList.add(onclass);
-                    } else {
-                        if (notification) span.innerHTML = "";
-                        div.classList.remove(onclass);
-                        div.classList.add(offclass);
-                    }
-                }
+        var rafunc = super.resetAnimation;
+        super.updateFunction = function(v) {
+            if (v) {
+                if (notification) div.innerHTML = onvalue;
+                div.classList.remove(offclass);
+                div.classList.add(onclass);
+            } else {
+                if (notification) div.innerHTML = offvalue;
+                div.classList.remove(onclass);
+                div.classList.add(offclass);
             }
         }
     }

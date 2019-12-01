@@ -1,60 +1,36 @@
-/**
- * AlertEditor implements a simple interactive form for editing the settings
- * of an application's AlertWidgets.
- *
-   AlertEditor will only work for
- * AlertWidgets which store their configuration data in the LocalSession
- * cache.
- *
- * When instantiated the editor scans the host document for all AlertWidget's
- * that meet the above criteria and builds a DOM tree consisting of a table of
- * user-editable widget settings. The tree has the following general structure.
- *
- * DIV .table.alert-editor
- *   DIV .table-head
- *     DIV .table-row
- *       DIV .table-cell (repeats for each attribute column title)
- *   DIV .table-body
- *     DIV .table-row.alert-editor-entry-[a|b] (repeats for each AlertWidget in the host document)
- *       DIV .table-cell.alert-editor-name 
- *       DIV .table-cell.alert-editor-test 
- *         LABEL
- *           INPUT .{alert-element-id}-test
- *       DIV .table-cell.alert-editor-threshold
- *         INPUT .{alert-element-id}-threshold
- *       DIV .table-cell.alert-editor-disabled
- *         INPUT .{alert-element-id}-disabled
- *       DIV .table-cell.alert-editor-active
- *
- * The returned AlertEditor instance offers
- * just two public methods:
- */
+class AlertEditor extends SignalK { 
 
-class AlertEditor { 
-
-    static createAlertEditor() {
-        return(new AlertEditor());
+    static createAlertEditor(container, host, port) {
+        return(new AlertEditor(container, host, port));
     } 
 
-    constructor() {
-        //console.log("AlertEditor()...");
+    constructor(container, host, port) {
+        super(host, port).waitForConnection().then(_ => {
+            this.container = container;
+            this.alerts = this.getAlertsFromLocalStorage();
 
-        this.tree = document.createElement("div");
-        this.tree.className = "table alert-editor";
-        this.tree.setAttribute("data-overlay-title", "ALERT SETTINGS");
-        this.tree.appendChild(this.tableHead());
-        this.tree.appendChild(this.tableBody());
+            container.appendChild(this.createTable());
+            var _this = this; window.close = function() { _this.onClose(); }
+        });
     }
 
-    getTree() { 
-        return(this.tree);
+    getAlertsFromLocalStorage() {
+        var retval = {};
+        Object.keys(window.localStorage).forEach(key => {
+            var parts = key.split(".");
+            if ((parts.length == 2) && (parts[1].startsWith("alert-"))) {
+                if (retval[parts[0]] === undefined) retval[parts[0]] = {};
+                retval[parts[0]][parts[1]] = LocalStorage.getItem(parts[0], parts[1]);
+            }
+        });
+        return(retval);
     }
 
     onClose() {
-        var rows = this.tree.getElementsByTagName("input");
+        var inputs = this.container.getElementsByTagName("input");
         var changed = [];
 
-        [...rows].forEach(e => {
+        [...inputs].forEach(e => {
             switch (e.type.toLowerCase()) {
                 case 'number':
                     if (e.value != e.defaultValue) changed.push([ e.name, e.value ]);
@@ -93,9 +69,18 @@ class AlertEditor {
         }
     }
 
+    createTable() {
+        var table = document.createElement("div");
+        table.className = "table alert-editor";
+        table.setAttribute("data-overlay-title", "ALERT SETTINGS");
+        table.appendChild(this.tableHead());
+        table.appendChild(this.tableBody());
+        return(table);
+    }
+
     tableHead() {
         var head = document.createElement("div"); head.className = "table-head";
-        [ "Alert name", "Test", "Threshold", "Disabled", "Active" ].forEach(value => {
+        [ "Alert name", "Test", "Threshold", "Disabled" ].forEach(value => {
             var cell = document.createElement("div");
             cell.className = "table-cell";
             cell.appendChild(document.createTextNode(value));
@@ -108,42 +93,42 @@ class AlertEditor {
         var rowstyle = [ "table-row-a", "table-row-b" ];
         var body = document.createElement("div");
         body.className = "table-body";
-        PageUtils.walk(document, "widget-alert", element => {
-            var row = this.tableRow(element.id, Parameters.createParameters(element.getAttribute("data-parameters")));
+            
+        Object.keys(this.alerts).forEach(key => {
+            var row = this.tableRow(key);
             row.classList.add(rowstyle[0]);
             body.appendChild(row);
-            rowstyle = rowstyle.push(rowstyle.shift());
+            rowstyle.push(rowstyle.shift());
         });
         return(body);
     }
 
-    tableRow(id, parameters) {
+    tableRow(key) {
         var row = document.createElement("div");
-        row.className = "table-row";
-        row.appendChild(this.nameCell(id, parameters));
-        row.appendChild(this.testCell(id, parameters));
-        row.appendChild(this.thresholdCell(id, parameters));
-        row.appendChild(this.disabledCell(id, parameters));
-        row.appendChild(this.activeCell(id, parameters));
+        row.className = "table-row ";
+        row.appendChild(this.nameCell(key));
+        row.appendChild(this.testCell(key));
+        row.appendChild(this.thresholdCell(key));
+        row.appendChild(this.disabledCell(key));
         return(row);
     }
 
-    nameCell(id, parameters) {
+    nameCell(key) {
         var cell = document.createElement("div");
         cell.className = "table-cell alert-editor-name";
-        cell.appendChild(document.createTextNode(id));
+        cell.appendChild(document.createTextNode(key));
         return(cell);
     }
 
-    testCell(id, parameters) {
-        var tests = parameters.getParameter("alert-test");
+    testCell(key) {
+        var tests = this.alerts[key]["alert-test"];
         var test = tests[0];
         var cell = document.createElement("div");
         cell.className = "table-cell alert-editor-test";
         tests.sort().forEach(label => {
             var input = document.createElement("input");
             input.setAttribute("type", "radio");
-            input.setAttribute("name", parameters.getParamString() + ".alert-test");
+            input.setAttribute("name", key + ".alert-test");
             input.setAttribute("value", label);
             input.checked = (test == label);
             input.defaultChecked = (test == label);
@@ -155,35 +140,28 @@ class AlertEditor {
         return(cell);
     }
         
-    thresholdCell(id, parameters) {
-        var threshold = parameters.getParameter("alert-threshold", parseFloat);
+    thresholdCell(key) {
+        var threshold = this.alerts[key]["alert-threshold"];
         var cell = document.createElement("div");
         cell.className = "table-cell alert-editor-threshold";
         var input = document.createElement("input");
-        input.setAttribute("name", parameters.getParamString() + ".alert-threshold");
+        input.setAttribute("name", key + ".alert-threshold");
         input.setAttribute('type', 'number');
         input.setAttribute('value', threshold);
         cell.appendChild(input);
         return(cell);
     }
 
-    disabledCell(id, parameters) {
-        var disabled = parameters.getParameter("alert-disabled");
+    disabledCell(key) {
+        var disabled = this.alerts[key]["alert-disabled"];
         var cell = document.createElement("div");
         cell.className = "table-cell alert-editor-disabled";
         var input = document.createElement("input");
-        input.setAttribute("name", parameters.getParamString() + ".alert-disabled");
+        input.setAttribute("name", key + ".alert-disabled");
         input.setAttribute('type', 'checkbox');
         input.checked = (disabled == "1");
         input.defaultChecked = (disabled == "1");
         cell.appendChild(input);
-        return(cell);
-    }
-
-    activeCell(id, parameters) {
-        var cell = document.createElement("div");
-        cell.className = "table-cell alert-editor-active " + (parameters.getParamString() + "-alert");
-        if (document.getElementById(id).classList.contains("alert-active")) cell.classList.add("alert-active");
         return(cell);
     }
 
