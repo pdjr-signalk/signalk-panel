@@ -22,7 +22,7 @@ class Panel extends SignalK {
             PageUtils.walk(document, "signalk-static", element => {
                 var path = PageUtils.getAttributeValue(element, "data-signalk-path");
                 var filter = FunctionFactory.getFilter(PageUtils.getAttributeValue(element, "data-filter"));
-                super.interpolateValue(path, element, true, filter);
+                super.interpolateValue(path, element, filter);
             });
 
             // Populate page with dynamic values derived from Signal K server
@@ -48,6 +48,12 @@ class Panel extends SignalK {
             });
         });
 
+    }
+
+    connectionLost() {
+        if (confirm("Server connection lost! Reconnect?")) {
+            window.location = window.location;
+        }
     }
 
 }

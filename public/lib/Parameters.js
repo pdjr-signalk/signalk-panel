@@ -25,7 +25,8 @@ class Parameters {
         } else {
             console.log("requested parameter %s not found in %s", name, JSON.stringify(params));
         }
-        return((parser !== undefined)?parser(retval):retval);
+    
+        return((retval !== undefined)?((parser !== undefined)?parser(retval):retval):retval);
     }
 
 }

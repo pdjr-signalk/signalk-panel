@@ -21,7 +21,7 @@ class Tanks extends SignalK {
         var tankChartRow = PageUtils.createElement("div", null, "table-row", null, tableBody);
 
         var collation = [];
-        super.getObject("tanks", true, tanks => {
+        super.getValue("tanks", tanks => {
             Object.keys(tanks).forEach(tankType => {
                 Object.keys(tanks[tankType]).forEach(tankNumber => {
                     if (tanks[tankType][tankNumber]["capacity"]["value"] < 10000) {
@@ -32,11 +32,10 @@ class Tanks extends SignalK {
                             "detail": tanks[tankType][tankNumber] 
                         });
                     }
-                });
+                }, (v) => v);
             });
 
             collation.sort((a,b) => (a.key < b.key)).forEach(entry => {
-                console.log(JSON.stringify(entry));
                 var tankPath = "tanks." + entry.type + "." + entry.number + ".currentLevel";
                 var tankCapacity = entry.detail.capacity.value;
                 PageUtils.createElement("div", null, "table-cell w3-theme-d1", this.legibleIdentifier(entry.type, entry.number), tankNameHeaderRow);

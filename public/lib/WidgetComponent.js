@@ -165,7 +165,6 @@ class CursorComponent extends WidgetComponent {
             };
         } else {
             super.updateFunction = function(v) {
-                console.log(v);
                 v = Math.round(((v - min) / (max - min)) * 100);
                 v = ((v < 0)?0:((v > 100)?100:v)); 
                 div.style.height = v + "%";

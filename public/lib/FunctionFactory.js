@@ -46,8 +46,8 @@ class FunctionFactory {
                                     return(
                                         function(v) {
                                             v = (FunctionFactory.getFilter("multiply", params))(v);
-                                            var min = parseFloat((params.min !== undefined)?params.min:0);
-                                            var max = parseFloat((params.max !== undefined)?params.max:100); 
+                                            var min = Parameters.get(params, "min", parseFloat)
+                                            var max = Parameters.get(params, "max", parseFloat)
                                             return(FunctionFactory.percent(v, min, max));
                                         }
                                     );
