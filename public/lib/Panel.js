@@ -8,6 +8,7 @@ class Panel extends SignalK {
         super(host, port).waitForConnection().then(_ => {
             // Initialise page helper library
             var pageutils = new PageUtils({ "overlayOnLoad": function(r) { }});
+            var functionfactory = new FunctionFactory();
 
             // Load document fragments
             PageUtils.include(document);
@@ -21,14 +22,14 @@ class Panel extends SignalK {
             // Populate page with static values derived from Signal K server
             PageUtils.walk(document, "signalk-static", element => {
                 var path = PageUtils.getAttributeValue(element, "data-signalk-path");
-                var filter = FunctionFactory.getFilter(PageUtils.getAttributeValue(element, "data-filter"));
+                var filter = functionfactory.getFilter(PageUtils.getAttributeValue(element, "data-filter"));
                 super.interpolateValue(path, element, filter);
             });
 
             // Populate page with dynamic values derived from Signal K server
             PageUtils.walk(document, "signalk-dynamic", element => {
                 var path = PageUtils.getAttributeValue(element, "data-signalk-path");
-                var filter = FunctionFactory.getFilter(PageUtils.getAttributeValue(element, "data-filter"));
+                var filter = functionfactory.getFilter(PageUtils.getAttributeValue(element, "data-filter"));
                 super.registerCallback(path, function(v) { alert("Hello"); });
             });
 
@@ -41,7 +42,7 @@ class Panel extends SignalK {
                         var source = Parameters.get(params, "source");
                         var filter = Parameters.get(params, "filter");
                         if (source !== undefined) {
-                            super.registerCallback(source, Widget.createWidget(element, widgetType, params, FunctionFactory.getFilter(filter, params)));
+                            super.registerCallback(source, Widget.createWidget(element, widgetType, params, functionfactory.getFilter(filter, params)));
                         }
                     } 
                 }

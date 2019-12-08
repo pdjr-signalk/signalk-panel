@@ -1,0 +1,26 @@
+<html>
+    <head>
+	    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	    <script type="text/javascript" src="/signalk-panel/lib/SignalK.js"></script>
+	    <script type="text/javascript" src="Gnss.js"></script>
+	    <link rel="stylesheet" type="text/css" href="/signalk-panel/css/style.css">
+        <title>GNSS Status</title>
+        <style type="text/css">
+        .widget-cursor {
+            background: lightblue;
+        }
+        .widget-scale-tick {
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            border-top: 1px solid lightblue;
+        }
+        .lcars_label {
+            text-align: left !important;
+        }
+        </style>
+    </head>
+    <body onload='Gnss.create(document.body, location.hostname, location.port);'>
+    </body>
+</html>

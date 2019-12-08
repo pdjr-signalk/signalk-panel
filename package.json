@@ -2,7 +2,7 @@
   "name": "signalk-panel",
   "version": "1.0.0",
   "description": "Signal K instrument panel",
-  "main": "index.js",
+  "main": "public/index.html",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -20,5 +20,8 @@
   "bugs": {
     "url": "https://github.com/preeve9534/signalk-panel/issues"
   },
-  "homepage": "https://github.com/preeve9534/signalk-panel#readme"
+  "homepage": "https://github.com/preeve9534/signalk-panel#readme",
+  "dependencies": {
+    "optimist": "^0.6.1"
+  }
 }

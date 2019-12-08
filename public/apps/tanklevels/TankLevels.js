@@ -1,13 +1,12 @@
-class Tanks extends SignalK {
+class TankLevels extends SignalK {
 
-    static createTanks(container, host, port) {
-        return(new Tanks(container, host, port));
+    static create(container, host, port) {
+        return(new TankLevels(container, host, port));
     }
 
     constructor(parentNode, host, port) {
         super(host, port).waitForConnection().then(_ => {
             this.parentNode = parentNode;
-
             this.buildTable(PageUtils.createElement("div", null, "table fixed", null, this.parentNode));
         });
     }
@@ -19,6 +18,7 @@ class Tanks extends SignalK {
         var tankCapacityHeaderRow = PageUtils.createElement("div", null, "table-row hidden", null, tableHeader);
         var tableBody = PageUtils.createElement("div", null, "table-row-group", null, table);
         var tankChartRow = PageUtils.createElement("div", null, "table-row", null, tableBody);
+        var functionFactory = new FunctionFactory();
 
         var collation = [];
         super.getValue("tanks", tanks => {
@@ -44,9 +44,9 @@ class Tanks extends SignalK {
                 var tankChartCell = PageUtils.createElement("div", null, "table-cell w3-theme-l1 vertical", null, tankChartRow);
                 tankChartCell.style.height = "80vh";
                 var params = { "min": 0, "max": 100, "ticks": 10, "factor": 100.0, "offset": 0, "places": 0, "filter": "multiply" };
-                super.registerCallback(tankPath, Widget.createWidget(tankChartCell, "gauge", params, FunctionFactory.getFilter("multiply", params)));
+                super.registerCallback(tankPath, Widget.createWidget(tankChartCell, "gauge", params, functionFactory.getFilter("multiply", params)));
                 var params = { "factor": "#" + entry.type + entry.number, "offset": 0, "places": 0, "filter": "multiply" };
-                super.registerInterpolation(tankPath, tankContentCell, FunctionFactory.getFilter("multiply", params));
+                super.registerInterpolation(tankPath, tankContentCell, functionFactory.getFilter("multiply", params));
             });
         });
     }

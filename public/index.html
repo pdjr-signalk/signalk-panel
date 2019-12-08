@@ -2,15 +2,13 @@
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-	<script type="text/javascript" src="lib/drag.js"></script>
-	<script type="text/javascript" src="lib/LocalStorage.js"></script>
-	<script type="text/javascript" src="lib/Parameters.js"></script>
 	<script type="text/javascript" src="lib/FunctionFactory.js"></script>
+	<script type="text/javascript" src="lib/LocalStorage.js"></script>
 	<script type="text/javascript" src="lib/Overlay.js"></script>
-	<script type="text/javascript" src="lib/Widget.js"></script>
-	<script type="text/javascript" src="lib/WidgetComponent.js"></script>
-	<script type="text/javascript" src="lib/pageutils.js"></script>
+	<script type="text/javascript" src="lib/PageUtils.js"></script>
+	<script type="text/javascript" src="lib/Parameters.js"></script>
 	<script type="text/javascript" src="lib/SignalK.js"></script>
+	<script type="text/javascript" src="lib/Widget.js"></script>
 	<script type="text/javascript" src="lib/Panel.js"></script>
 	<link rel="stylesheet" type="text/css" href="css/style.css">
 	<title>SignalK Panel</title>
@@ -48,7 +46,7 @@
             <div class="lcars-bar horizontal">
                 <div class="signalk-static lcars-title right" data-signalk-path="name"></div>
             </div>
-            <div class="lcars-bar horizontal right-end decorated" onClick="Overlay.createOverlay(['includes/overlays/alerteditor/alerteditor.html'])">
+            <div class="lcars-bar horizontal right-end decorated" onClick="Overlay.createOverlay(['apps/alerteditor/'])">
             </div>
         </div>
 
