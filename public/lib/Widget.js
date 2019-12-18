@@ -1,8 +1,29 @@
 class Widget {
 
-    static createWidget(parentNode, type, params, filter) {
-        //console.log("createWidget(%s,%s,%s)...", parentNode, type, JSON.stringify(params)); 
-        return(new Widget(parentNode, type, params, filter));
+    static createWidget(element, filterName) {
+        console.log("createWidget(%s,%s)...", element, filterName);
+
+        var retval = null;
+        var type = element.className.split(" ").reduce((a,v) => { return((v.startsWith("widget-"))?v.substr(7):null); }, null);
+        var params = {};
+        var filter = undefined;
+
+        if (type) {
+            console.log("Creating %s", type);
+            var displaymode = element.getAttribute("data-widget-display-mode") || "0";
+            var params = JSON.parse(element.getAttribute("data-widget-display-mode." + displaymode)) || {};
+            for (var i = 0; i < element.attributes.length; i++) {
+                var name = element.attributes[i].name;
+                var value = element.attributes[i].value;
+                if (name.startsWith("data-widget-display-mode." + displaymode + ".")) params[name.substr(25)] = value;
+            }
+            console.log("PARAMS %s", JSON.stringify(params));
+            if (filterName) filter = (new FunctionFactory()).getFilter(filterName, params);
+            retval = new Widget(element, type, params, filter);
+        } else {
+            console.log("element does not have a 'widget-type' class");
+        }
+        return(retval);
     }
 
     constructor(parentNode, type, params, filter) {
@@ -13,6 +34,8 @@ class Widget {
         this.params = params;
         this.filter = filter;
         this.components = [];
+        this.labels = document.querySelectorAll('[for="' + parentNode.id + '"]');
+        [...this.labels].forEach(label => { label.innerHTML = this.params.name; });
 
         switch (type) {
             case "alert":
@@ -56,6 +79,14 @@ class Widget {
         }
     }
 
+    static availableComponents() {
+        return([ "alert", "cursor", "scale", "text", "indicator" ]);
+    }
+
+    static getParameterNamesForComponent(cname) {
+        return(WidgetComponent.getParameterNames(cname));
+    }
+
     update(value) {
         //console.log("Widget.update(%s)...", JSON.stringify(value));
 
@@ -65,6 +96,7 @@ class Widget {
     }
 
 }
+
 class WidgetComponent {
 
     static createWidgetComponent(parentNode, type, params) {
@@ -91,10 +123,33 @@ class WidgetComponent {
             default:
                 break;
         }
-
         return(retval);
     }
 
+    static getParameterNames(cname) {
+        var retval = [];
+        switch (cname) {
+            case "alert":
+                retval = AlertComponent.getParameterNames();
+                break;
+            case "scale":
+                retval = ScaleComponent.getParameterNames();
+                break;
+            case "cursor":
+                retval = CursorComponent.getParameterNames();
+                break;
+            case "text":
+                retval = TextComponent.getParameterNames();
+                break;
+            case "indicator":
+                retval = IndicatorComponent.getParameterNames();
+                break;
+            default:
+                break;
+        }
+        return(retval);
+    }
+        
     constructor(parentNode, params) {
         this.parentNode = parentNode;
         this.params = params;
@@ -179,6 +234,10 @@ class AlertComponent extends WidgetComponent {
         }
     }
 
+    static getParameterNames() {
+        return([ "alert-disabled", "alert-test", "alert-threshold" ]);
+    }
+
 }
 
 class ScaleComponent extends WidgetComponent {
@@ -216,6 +275,10 @@ class ScaleComponent extends WidgetComponent {
         super.setTree(div);
     }
 
+    static getParameterNames() {
+        return([ "max", "min", "ticks" ]);
+    }
+
 }
 
 class CursorComponent extends WidgetComponent {
@@ -251,6 +314,10 @@ class CursorComponent extends WidgetComponent {
         }
     }
 
+    static getParameterNames() {
+        return([ "max", "min" ]);
+    }
+
 }
 
 class TextComponent extends WidgetComponent {
@@ -269,10 +336,10 @@ class TextComponent extends WidgetComponent {
         table.appendChild(cell);
         var span = document.createElement("span");
         span.innerHTML = "???";
-        var found = parentNode.innerHTML.match(/(.*)---(.*)/);
-        if ((found) && (found.length >= 2)) cell.appendChild(document.createTextNode(found[1]));
+        var found = parentNode.innerHTML.trim().match(/(.*)---(.*)/);
+        if ((found) && (found.length >= 2) && (found[1] != "")) { var d = document.createElement("div"); d.innerHTML = found[1]; cell.appendChild(d.firstChild); }
         cell.appendChild(span);
-        if ((found) && (found.length >= 3)) cell.appendChild(document.createTextNode(found[2]));
+        if ((found) && (found.length >= 3) && (found[2] != "")) { var d = document.createElement("div"); d.innerHTML = found[2]; cell.appendChild(d.firstChild); }
         super.setTree(table);
 
         var funcra = super.resetAnimation;
@@ -280,6 +347,10 @@ class TextComponent extends WidgetComponent {
             span.innerHTML = (v.charAt(0) == "-")?v.substr(1):v;
             funcra(cell);
         });
+    }
+
+    static getParameterNames() {
+        return([]);
     }
 
 }
@@ -319,6 +390,10 @@ class IndicatorComponent extends WidgetComponent {
                 div.classList.add(offclass);
             }
         });
+    }
+ 
+    static getParameterNames() {
+        return([ "offclass", "offvalue", "onclass", "onvalue" ]);
     }
 
 }

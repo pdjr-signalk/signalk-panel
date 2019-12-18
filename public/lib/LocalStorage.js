@@ -1,5 +1,17 @@
 class LocalStorage {
 
+    static setAsAttributes(classname, element) {
+        console.log("setAsAttributes(%s,%s)...", classname, element);
+
+        Object.keys(window.localStorage).forEach(key => {
+            if (key.startsWith(classname + ".")) {
+                var name = key.substring(classname.length + 1);
+                var value = window.localStorage[key];
+                element.setAttribute(name, value);
+            }
+        });
+    }
+ 
     static initialise(root, force=false) {
         //console.log("LocalStorage.initialise(%s,%s)...", root, force);
 
@@ -63,6 +75,10 @@ class LocalStorage {
         classname = (value === undefined)?classname:(classname + "." + name);
         value = (value === undefined)?name:value;
         window.localStorage.setItem(classname, value);
+    }
+
+    static changeScale(classname) {
+        alert("Changing " + classname);
     }
 
 }

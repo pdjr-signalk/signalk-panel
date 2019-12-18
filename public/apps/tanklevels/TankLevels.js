@@ -38,17 +38,26 @@ class TankLevels extends SignalK {
             collation.sort((a,b) => (a.key < b.key)).forEach(entry => {
                 var tankPath = "tanks." + entry.type + "." + entry.number + ".currentLevel";
                 var tankCapacity = entry.detail.capacity.value;
+
                 PageUtils.createElement("div", null, "table-cell w3-theme-d1", this.legibleIdentifier(entry.type, entry.number), tankNameHeaderRow);
                 var tankContentCell = PageUtils.createElement("div", null, "table-cell w3-theme-d1", null, tankContentHeaderRow);
                 PageUtils.createElement("div", (entry.type + entry.number), "table-cell hidden", tankCapacity, tankCapacityHeaderRow);
-                var tankChartCell = PageUtils.createElement("div", null, "table-cell w3-theme-l1 vertical", null, tankChartRow);
-                tankChartCell.style.height = "80vh";
-                var params = { "min": 0, "max": 100, "ticks": 10, "factor": 100.0, "offset": 0, "places": 0, "filter": "multiply" };
-                super.registerCallback(tankPath, Widget.createWidget(tankChartCell, "gauge", params, functionFactory.getFilter("multiply", params)));
+
+                var tankChartCell = this.createTankChartCell();
+                tankChartRow.appendChild(tankChartCell);
+                super.registerCallback(tankPath, Widget.createWidget(tankChartCell, "multiply"));
+
                 var params = { "factor": "#" + entry.type + entry.number, "offset": 0, "places": 0, "filter": "multiply" };
                 super.registerInterpolation(tankPath, tankContentCell, functionFactory.getFilter("multiply", params));
             });
         });
+    }
+
+    createTankChartCell() {
+        var cell = PageUtils.createElement("div", null, "table-cell w3-theme-l1 vertical widget-gauge");
+        cell.setAttribute("data-widget-display-mode.0", '{ "name": "%", "min": 0, "max": 100, "ticks": 10, "factor": 100.0, "offset": 0, "places": 0 }');
+        cell.style.height = "80vh";
+        return(cell);
     }
 
     legibleIdentifier(type, number) {

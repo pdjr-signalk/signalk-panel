@@ -4,45 +4,28 @@ class FunctionFactory {
         this.filters = {
 
             "multiply":             function(params) {
-                                        var params = params;
+                                        if (!params) return([ "factor","offset","places" ]);
+                                        var _params = params;
                                         return(
                                             function(v) {
                                                 v = (v == null)?0:v;
-                                                var factor = Parameters.get(params, "factor", parseFloat);
-                                                var offset = Parameters.get(params, "offset", parseFloat);
-                                                var places = Parameters.get(params, "places", parseInt);
+                                                var factor = Parameters.get(_params, "factor", parseFloat);
+                                                var offset = Parameters.get(_params, "offset", parseFloat);
+                                                var places = Parameters.get(_params, "places", parseInt);
                                                 return(((parseFloat(v) * factor) + offset).toFixed(places));
                                             }
                                         );
                                     },
     
             "multiplyPercent":      function(params) {
-                                        var params = params;
+                                        if (!params) return(["factor","min","max","offset","places"]);
+                                        var _params = params;
                                         return(
                                             function(v) {
-                                                v = (FunctionFactory.getFilter("multiply", params))(v);
-                                                var min = Parameters.get(params, "min", parseFloat)
-                                                var max = Parameters.get(params, "max", parseFloat)
+                                                v = (FunctionFactory.getFilter("multiply", _params))(v);
+                                                var min = Parameters.get(_params, "min", parseFloat)
+                                                var max = Parameters.get(_params, "max", parseFloat)
                                                 return(FunctionFactory.percent(v, min, max));
-                                            }
-                                        );
-                                    },
-    
-            "test":                 function(args={}) {
-                                        var args = args;
-                                        return(
-                                            function(v) {
-                                                v = parseFloat(v);
-                                                var retval = false;
-                                                var _args = FunctionFactory.resolveValues(args);
-                                                var threshold = parseFloat(_args.threshold);
-                                                switch (_args.test) {
-                                                    case "eq": retval = (v == threshold); break;
-                                                    case "lt": retval = (v < threshold); break;
-                                                    case "gt": retval = (v > threshold); break;
-                                                    default: break;
-                                                }
-                                                return(retval);
                                             }
                                         );
                                     },
@@ -57,6 +40,7 @@ class FunctionFactory {
                                     },
     
             "identity":             function(params) {
+                                        if ((typeof params === "string") && (params == "?")) return([]);
                                         return(
                                             function(v) {
                                                 return((typeof v === "string")?v.trim():v);
@@ -65,6 +49,7 @@ class FunctionFactory {
                                     },
     
             "date":                 function(context) {
+                                        if ((typeof params === "string") && (params == "?")) return([]);
                                         return(
                                             function(v) {
                                                 return(v.substr(0, v.indexOf('T')));
@@ -73,6 +58,7 @@ class FunctionFactory {
                                     },
     
             "time":                 function(context) {
+                                        if ((typeof params === "string") && (params == "?")) return([]);
                                         return(
                                             function(v) {
                                                 return(v.substr(v.indexOf('T')+1));
@@ -123,6 +109,10 @@ class FunctionFactory {
                                         );
                                     } 
         } 
+    }
+
+    getFilterNames() {
+        return(Object.keys(this.filters));
     }
     
     getFilter(name="identity", context) {

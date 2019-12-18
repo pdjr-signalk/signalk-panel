@@ -13,8 +13,8 @@
 	<link rel="stylesheet" type="text/css" href="css/style.css">
 	<title>SignalK Panel</title>
     <script>
-        function noRightClick() {
-            document.addEventListener("contextmenu", (e) => { contextHandler(e); e.preventDefault(); });
+        function noRightClick(contextHandler) {
+            document.addEventListener("contextmenu", (e) => { e.preventDefault(); });
             window.event.cancelBubble = true;
         }
     </script>

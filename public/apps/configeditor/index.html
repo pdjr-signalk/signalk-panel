@@ -1,0 +1,115 @@
+<html>
+    <head>
+	    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	    <script type="text/javascript" src="/signalk-panel/lib/FunctionFactory.js"></script>
+	    <script type="text/javascript" src="/signalk-panel/lib/LocalStorage.js"></script>
+	    <script type="text/javascript" src="/signalk-panel/lib/PageUtils.js"></script>
+	    <script type="text/javascript" src="/signalk-panel/lib/SignalK.js"></script>
+	    <script type="text/javascript" src="/signalk-panel/lib/Source.js"></script>
+	    <script type="text/javascript" src="/signalk-panel/lib/Widget.js"></script>
+	    <script type="text/javascript" src="ConfigEditor.js"></script>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+	    <link rel="stylesheet" type="text/css" href="/signalk-panel/css/style.css">
+        <title>Config Editor</title>
+        <style type="text/css">
+        .widget-cursor {
+            background: lightblue;
+        }
+        .widget-scale-tick {
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            border-top: 1px solid lightblue;
+        }
+        .lcars_label {
+            text-align: left !important;
+        }
+        input {
+            width: 4em;;
+        }
+        label {
+            display: block;
+        }
+        .table-header-group {
+            background: darkblue;
+        }
+        .table-row-group {
+            background: blue;
+        }
+        .table-row-group .input {
+            appearance: none;
+            background: grey;
+        }
+        h2 {
+            font-size: 1em;
+        }
+        </style>
+    </head>
+    <body onload='ConfigEditor.create(document.body, location.hostname, location.port);' class="container">
+        <h1>Panel configuration editor</h1>
+        <p>
+        </p>
+        <div>
+            <div class="row">
+                <div class="col-sm-4 form-group">
+                    <div class="input-group input-group-primary mb-3">
+                        <div class="input-group-prepend">
+                            <label class="input-group-text" for="source-list">Source</label>
+                        </div>
+                        <select id="source-list" class="custom-select" disabled>
+                        </select>
+                    </div>
+                    <small id="source-list-help" class="form-text text-muted">Select the source you would like to modify.</small>
+                </div>
+                <div class="col-sm-8 form-group">
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <label class="input-group-text" for="path-list">SignalK path</label>
+                        </div>
+                        <select id="path-list" class="custom-select" disabled>
+                        </select>
+                    </div>
+                    <small id="path-list-help" class="form-text text-muted"></small>
+                </div>
+            </div>
+        </div>
+
+        <div id="editor-panel" class="border border-primary rounded p-2 collapse container">
+            <div class="row">
+                <div class="col-sm-5 mb-4 input-group">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text" for="path-list">Source filter</label>
+                    </div>
+                    <select id="filter-list" class="custom-select">
+                    </select>
+                </div>
+                <div id="widget-panel" class="col-sm-7 text-right widget-panel">
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-11">
+                    <nav>
+                        <div id="mode-list" class="nav nav-tabs" id="nav-tab" role="tablist">
+                        </div>
+                    </nav>
+                    <div id="mode-container" class="tab-content py-3 px-3 px-sm-0">
+                    </div>
+                </div>
+                <div class="col-sm-1 m-0 p-0">
+                    <button id="btn-mode-add" class="btn btn-outline-primary m-0">+</button>
+                    <button id="btn-mode-del" class="btn btn-outline-primary m-0">-</button>
+                </div>
+            </div>
+            <div class="row float-right m-3">
+                <button id="cancel" class="btn btn-primary m-1">Cancel</button>
+                <button id="submit" class="btn btn-primary m-1">Submit</button>
+            </div>
+        </div>
+
+        <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    </body>
+</html>

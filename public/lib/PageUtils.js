@@ -9,11 +9,17 @@ class PageUtils {
     static createElement(type, id, classname, content, parentNode) {
         var retval = document.createElement(type);
         if (retval) {
-            if (id) retval.id = id;
-            if (classname) retval.className = classname;
-            if (content) retval.innerHTML = content;
+            if (id != null) retval.id = id;
+            if (classname != null) retval.className = classname;
+            if (content != null) {
+                if (typeof content === "object") {
+                    retval.appendChild(content);
+                } else {
+                     retval.innerHTML = content;
+                }
+            }
         }
-        if (parentNode) parentNode.appendChild(retval);
+        if (parentNode != null) parentNode.appendChild(retval);
         return(retval);
     }
  

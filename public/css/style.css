@@ -3446,6 +3446,9 @@ a.lcars-text-box, .lcars-element .lcars-element-addition, .alert-editor .table-r
 .table-cell.widget-indicator {
   padding: 2px; }
 
+.table-caption {
+  display: table-caption; }
+
 html, body {
   background: black;
   color: white;

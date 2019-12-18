@@ -1,11 +1,11 @@
 <div class="lcars-row">
     <div class="lcars-element left-rounded lcars-u-1-1">
-        <div class="lcars-element-addition widget-text" data-parameters="!depth">---</div>
+        <div id="depth" class="lcars-element-addition widget-text" data-source="depth">---</div>
     </div>
     <div class="lcars-element lcars-u-4">
-        <div class="widget-gauge" data-parameters="!depth"></div>
+        <div class="widget-gauge" data-source="depth"></div>
     </div>
     <div id="depth-alert" class="lcars-element right-rounded lcars-u-1-1 widget-alert" data-parameters="!depth">
-        Depth/<span class="storage-item-value" data-storage-item-name="depth.units"></span>
+        Depth/<label for="depth"></label>
     </div>
 </div>

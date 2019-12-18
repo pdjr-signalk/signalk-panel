@@ -35,16 +35,9 @@ class Panel extends SignalK {
 
             // Populate page with widgets
             PageUtils.wildWalk(document, "widget-", element => {
-                var widgetType = element.className.split(" ").reduce((a,v) => { return((v.startsWith("widget-"))?v.substr(7):undefined); }, undefined);
-                if (widgetType != undefined) {
-                    if (element.hasAttribute("data-parameters")) {
-                        var params = Parameters.parse(element.getAttribute("data-parameters"));
-                        var source = Parameters.get(params, "source");
-                        var filter = Parameters.get(params, "filter");
-                        if (source !== undefined) {
-                            super.registerCallback(source, Widget.createWidget(element, widgetType, params, functionfactory.getFilter(filter, params)));
-                        }
-                    } 
+                if (element.hasAttribute("data-source")) LocalStorage.setAsAttributes(element.getAttribute("data-source"), element); 
+                if (element.hasAttribute("data-signalk-path")) {
+                    super.registerCallback(element.getAttribute("data-signalk-path"), Widget.createWidget(element, element.getAttribute("data-filter")));
                 }
             });
         });
@@ -55,6 +48,10 @@ class Panel extends SignalK {
         if (confirm("Server connection lost! Reconnect?")) {
             window.location = window.location;
         }
+    }
+
+    rightClick(e) {
+        alert("Hello");
     }
 
 }
