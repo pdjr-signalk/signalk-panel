@@ -3,11 +3,11 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<script type="text/javascript" src="lib/FunctionFactory.js"></script>
-	<script type="text/javascript" src="lib/LocalStorage.js"></script>
 	<script type="text/javascript" src="lib/Overlay.js"></script>
 	<script type="text/javascript" src="lib/PageUtils.js"></script>
 	<script type="text/javascript" src="lib/Parameters.js"></script>
 	<script type="text/javascript" src="lib/SignalK.js"></script>
+	<script type="text/javascript" src="lib/StructuredStorage.js"></script>
 	<script type="text/javascript" src="lib/Widget.js"></script>
 	<script type="text/javascript" src="lib/Panel.js"></script>
 	<link rel="stylesheet" type="text/css" href="css/style.css">
@@ -16,6 +16,7 @@
         function noRightClick(contextHandler) {
             document.addEventListener("contextmenu", (e) => { e.preventDefault(); });
             window.event.cancelBubble = true;
+            //document.addEventListener("touchstart", function(e) { alert("E"); });
         }
     </script>
     <style>

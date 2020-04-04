@@ -1,0 +1,586 @@
+<html>
+    <head>
+	    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	    <script type="text/javascript" src="/signalk-panel/lib/FunctionFactory.js"></script>
+	    <script type="text/javascript" src="/signalk-panel/lib/PageUtils.js"></script>
+	    <script type="text/javascript" src="/signalk-panel/lib/SignalK.js"></script>
+	    <script type="text/javascript" src="/signalk-panel/lib/Source.js"></script>
+	    <script type="text/javascript" src="/signalk-panel/lib/StructuredStorage.js"></script>
+	    <script type="text/javascript" src="/signalk-panel/lib/Widget.js"></script>
+	    <script type="text/javascript" src="ConfigEditor.js"></script>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+	    <link rel="stylesheet" type="text/css" href="/signalk-panel/css/style.css">
+        <title>Config Editor</title>
+        <style type="text/css">
+        .widget-cursor {
+            background: lightblue;
+        }
+        .widget-scale-tick {
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            border-top: 1px solid lightblue;
+        }
+        .lcars_label {
+            text-align: left !important;
+        }
+        input {
+            width: 4em;;
+        }
+        label {
+            display: block;
+        }
+        .table-header-group {
+            background: darkblue;
+        }
+        .table-row-group {
+            background: blue;
+        }
+        .table-row-group .input {
+            appearance: none;
+            background: grey;
+        }
+        h2 {
+            font-size: 1em;
+        }
+        .table-cell {
+            width: 100px;
+        }
+        .table-cell::selection {
+            background: red;
+        }
+        .week-programmer {
+            position: relative;
+        }
+        .week-programmer .layer{
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        .week-programmer .overlay {
+            z-index: 10;
+        }
+        .overlay .table-cell {
+            
+        }
+        </style>
+    </head>
+    <body>
+        <div class="week-programmer">
+            <div class="layer">
+		        <div class="table">
+		            <div class="table-body">
+		                <div class="table-row">
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell">Sat</div>
+		                    <div class="table-cell">Sun</div>
+		                    <div class="table-cell">Mon</div>
+		                    <div class="table-cell">Tue</div>
+		                    <div class="table-cell">Wed</div>
+		                    <div class="table-cell">Thu</div>
+		                    <div class="table-cell">Fri</div>
+		                </div>
+		                <div class="table-row">
+		                    <div class="table-cell">00:00</div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                </div>
+		                <div class="table-row">
+		                    <div class="table-cell">01:00</div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                </div>
+		                <div class="table-row">
+		                    <div class="table-cell">02:00</div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                </div>
+		                <div class="table-row">
+		                    <div class="table-cell">03:00</div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                </div>
+		                <div class="table-row">
+		                    <div class="table-cell">04:00</div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                </div>
+		                <div class="table-row">
+		                    <div class="table-cell">05:00</div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                </div>
+		                <div class="table-row">
+		                    <div class="table-cell">06:00</div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                </div>
+		                <div class="table-row">
+		                    <div class="table-cell">07:00</div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                </div>
+		                <div class="table-row">
+		                    <div class="table-cell">08:00</div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                </div>
+		                <div class="table-row">
+		                    <div class="table-cell">09:00</div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                </div>
+		                <div class="table-row">
+		                    <div class="table-cell">10:00</div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                </div>
+		                <div class="table-row">
+		                    <div class="table-cell">11:00</div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                </div>
+		                <div class="table-row">
+		                    <div class="table-cell">12:00</div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                </div>
+		                <div class="table-row">
+		                    <div class="table-cell">13:00</div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                </div>
+		                <div class="table-row">
+		                    <div class="table-cell">14:00</div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                </div>
+		                <div class="table-row">
+		                    <div class="table-cell">15:00</div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                </div>
+		                <div class="table-row">
+		                    <div class="table-cell">16:00</div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                </div>
+		                <div class="table-row">
+		                    <div class="table-cell">17:00</div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                </div>
+		                <div class="table-row">
+		                    <div class="table-cell">18:00</div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                </div>
+		                <div class="table-row">
+		                    <div class="table-cell">19:00</div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                </div>
+		                <div class="table-row">
+		                    <div class="table-cell">20:00</div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                </div>
+		                <div class="table-row">
+		                    <div class="table-cell">21:00</div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                </div>
+		                <div class="table-row">
+		                    <div class="table-cell">22:00</div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                </div>
+		                <div class="table-row">
+		                    <div class="table-cell">23:00</div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                </div>
+		            </div>
+		        </div>
+		    </div>
+        </div>
+        <div class="layer overlay">
+		        <div class="table">
+		            <div class="table-body">
+		                <div class="table-row">
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell">Sat</div>
+		                    <div class="table-cell">Sun</div>
+		                    <div class="table-cell">Mon</div>
+		                    <div class="table-cell">Tue</div>
+		                    <div class="table-cell">Wed</div>
+		                    <div class="table-cell">Thu</div>
+		                    <div class="table-cell">Fri</div>
+		                </div>
+		                <div class="table-row">
+		                    <div class="table-cell">00:00</div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                </div>
+		                <div class="table-row">
+		                    <div class="table-cell">01:00</div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                </div>
+		                <div class="table-row">
+		                    <div class="table-cell">02:00</div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                </div>
+		                <div class="table-row">
+		                    <div class="table-cell">03:00</div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                </div>
+		                <div class="table-row">
+		                    <div class="table-cell">04:00</div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                </div>
+		                <div class="table-row">
+		                    <div class="table-cell">05:00</div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                </div>
+		                <div class="table-row">
+		                    <div class="table-cell">06:00</div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                </div>
+		                <div class="table-row">
+		                    <div class="table-cell">07:00</div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                </div>
+		                <div class="table-row">
+		                    <div class="table-cell">08:00</div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                </div>
+		                <div class="table-row">
+		                    <div class="table-cell">09:00</div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                </div>
+		                <div class="table-row">
+		                    <div class="table-cell">10:00</div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                </div>
+		                <div class="table-row">
+		                    <div class="table-cell">11:00</div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                </div>
+		                <div class="table-row">
+		                    <div class="table-cell">12:00</div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                </div>
+		                <div class="table-row">
+		                    <div class="table-cell">13:00</div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                </div>
+		                <div class="table-row">
+		                    <div class="table-cell">14:00</div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                </div>
+		                <div class="table-row">
+		                    <div class="table-cell">15:00</div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                </div>
+		                <div class="table-row">
+		                    <div class="table-cell">16:00</div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                </div>
+		                <div class="table-row">
+		                    <div class="table-cell">17:00</div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                </div>
+		                <div class="table-row">
+		                    <div class="table-cell">18:00</div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                </div>
+		                <div class="table-row">
+		                    <div class="table-cell">19:00</div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                </div>
+		                <div class="table-row">
+		                    <div class="table-cell">20:00</div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                </div>
+		                <div class="table-row">
+		                    <div class="table-cell">21:00</div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                </div>
+		                <div class="table-row">
+		                    <div class="table-cell">22:00</div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                </div>
+		                <div class="table-row">
+		                    <div class="table-cell">23:00</div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                    <div class="table-cell"></div>
+		                </div>
+		            </div>
+		        </div>
+		    </div>
+        </div>
+	</body>
+</html>

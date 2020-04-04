@@ -1,7 +1,9 @@
 /**
  * Package: SignalkPanel
  * 
- * Source binds together and names a SignalK path, a filter for processing
+ * Source binds together and names an arbitrary collection of data values and
+ * provides a mechanism for saving them in browser persistent storage.
+ *  SignalK path, a filter for processing
  * values delivered on that path and one or more collections of Widget
  * configuration parameters.  It is useful because it simplifies embedding a
  * panel display widget into a web interface. For example, a tag such as:
@@ -46,27 +48,28 @@ class Source {
      * definitions values exist in local storage.
      */
  
-    static createFromLocalStorage(name) {
-        //console.log("createFromLocalStorage(%s)...", name);
+    static createFromStorage(name, storage) {
+        //console.log("createFromLocalStorage(%s,%s)...", name, storage);
         var source = new Source(name);
-        var attributeNames = Object.keys(window.localStorage).filter(key => { var parts = key.split('.'); return(parts[0] == name); }).forEach(key => {
+        var items = storage.getItems(name);
+
+        Object.keys(items).forEach(key => {
+            console.log("*** " + key);
             var parts = key.split('.');
             switch (parts.length) {
                 case 1:
-                    console.log("ignoring empty field definition");
+                    source.setAttribute(parts[0], storage.getItem(name + "." + key));
                     break;
                 case 2:
-                    source.setAttribute(parts[1], window.localStorage[key]);
-                    break;
-                case 3:
-                    var value = JSON.parse(window.localStorage[key]);
+                    var value = storage.getItem(name + "." + key);
                     var oname = value["name"]; delete value.name;
-                    source.setAttribute(parts[1], oname, value);
+                    source.setAttribute(parts[0], oname, value);
                     break;
                 default:
                     break;
             }
         });
+        console.log(JSON.stringify(source));
         return(source);
     }
                
@@ -76,6 +79,7 @@ class Source {
     }
 
     setAttribute(name, a2, a3, a4) {
+        console.log("setAttribute(%s,%s,%s,%s)...", name, a2, a3, a4);
         if (a4) {
             this.attributes[name][a2][a3] = a4;
         } else if (a3) {
@@ -95,22 +99,18 @@ class Source {
         }
     }
 
-    saveToLocalStorage() {
+    saveToLocalStorage(storage) {
         var idx = 0;
         Object.keys(this.attributes).forEach(key => {
             if (typeof this.attributes[key] === "object") {
                 Object.keys(this.attributes[key]).forEach(k => {
                     var o = this.attributes[key][k]; o["name"] = k;
-                    window.localStorage[this.name + "." + key + "." + idx] = JSON.stringify(o);
+                    storage.setItem(key + "." + idx, o, this.name, true);
                 });
             } else {
-                window.localStorage[this.name + "." + key] = this.attributes[key];
+                storage.setItem(key, this.attributes[key], this.name, true);
             }
         });
-    }
-
-    dump() {
-        console.log("%s: %s", this.name, JSON.stringify(this.attributes));
     }
 
 }

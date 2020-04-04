@@ -7,6 +7,7 @@ class ConfigEditor extends SignalK {
     constructor(container, host, port) {
         super(host, port).waitForConnection().then(_ => {
             this.functionFactory = new FunctionFactory();
+            this.localStorage = StructuredStorage.create(window.localStorage, "pdjr");
             this.sources = this.loadSourcesFromLocalStorage();
             this.selectedSource = null;
             
@@ -192,11 +193,9 @@ class ConfigEditor extends SignalK {
 
     loadSourcesFromLocalStorage() {
         var retval = {};
-        Object.keys(window.localStorage).forEach(key => {
-            var parts = key.split(".");
-            if (parts.length >= 2) {
-                retval[parts[0]] = Source.createFromLocalStorage(parts[0]);
-            }
+        var sourceNames = new Set(this.localStorage.getItemNames().map(n => n.split(".")[0]));
+        Array.from(sourceNames).forEach(sourceName => {
+            retval[sourceName] = Source.createFromStorage(sourceName, this.localStorage);
         });
         return(retval);
     }
@@ -241,7 +240,7 @@ class ConfigEditor extends SignalK {
         }
         if (option == null) {
             option = document.createElement("option"); option.setAttribute("value", optionValue); option.innerHTML = optionValue; 
-            selectelement.insertAfter(option, selectelement.options[i]);
+            selectelement.insertBefore(option, null);
         }
         option.selected = selected;
         return(option);

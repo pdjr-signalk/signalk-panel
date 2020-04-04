@@ -1,7 +1,7 @@
 class Widget {
 
     static createWidget(element, filterName) {
-        console.log("createWidget(%s,%s)...", element, filterName);
+        //console.log("createWidget(%s,%s)...", element, filterName);
 
         var retval = null;
         var type = element.className.split(" ").reduce((a,v) => { return((v.startsWith("widget-"))?v.substr(7):null); }, null);
@@ -9,7 +9,6 @@ class Widget {
         var filter = undefined;
 
         if (type) {
-            console.log("Creating %s", type);
             var displaymode = element.getAttribute("data-widget-display-mode") || "0";
             var params = JSON.parse(element.getAttribute("data-widget-display-mode." + displaymode)) || {};
             for (var i = 0; i < element.attributes.length; i++) {
@@ -17,7 +16,6 @@ class Widget {
                 var value = element.attributes[i].value;
                 if (name.startsWith("data-widget-display-mode." + displaymode + ".")) params[name.substr(25)] = value;
             }
-            console.log("PARAMS %s", JSON.stringify(params));
             if (filterName) filter = (new FunctionFactory()).getFilter(filterName, params);
             retval = new Widget(element, type, params, filter);
         } else {
@@ -83,8 +81,13 @@ class Widget {
         return([ "alert", "cursor", "scale", "text", "indicator" ]);
     }
 
+    /**
+     * Returns an array of parameter names accepted by component <cname>, or
+     * null if <cname> does not identify a valid component.
+     */
+
     static getParameterNamesForComponent(cname) {
-        return(WidgetComponent.getParameterNames(cname));
+        return((Widget.availableComponents().contains(cname))?WidgetComponent.getParameterNames(cname):null);
     }
 
     update(value) {
