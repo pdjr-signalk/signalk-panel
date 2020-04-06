@@ -6,7 +6,7 @@
 	<script type="text/javascript" src="lib/Overlay.js"></script>
 	<script type="text/javascript" src="lib/PageUtils.js"></script>
 	<script type="text/javascript" src="lib/Parameters.js"></script>
-	<script type="text/javascript" src="lib/SignalK.js"></script>
+	<script type="text/javascript" src="lib/signalk-client/SignalkClient.js"></script>
 	<script type="text/javascript" src="lib/StructuredStorage.js"></script>
 	<script type="text/javascript" src="lib/Widget.js"></script>
 	<script type="text/javascript" src="lib/Panel.js"></script>
@@ -25,7 +25,7 @@
     }
     </style>
 </head>
-<body onload="noRightClick(); Panel.createPanel(document.body, location.hostname, location.port);">
+<body onload="noRightClick(); Panel.createPanel(document.body, { server: location.hostname, port: location.port });">
     <div data-include="config.html"></div>
     <div class="lcars-app-container">
 
