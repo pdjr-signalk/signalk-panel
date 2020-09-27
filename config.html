@@ -1,5 +1,10 @@
 <div class="storage-config">
 
+    <div class="storage-group" data-name="generator">
+        <div class="storage-item" data-name="data-signalk-path" data-value="electrical.switches.16.14.state"></div>
+        <div class="storage-item" data-name="data-widget-display-mode.0" data-value='{ "onvalue": "GEN" }'></div>
+    </div>
+
     <div class="storage-group" data-name="ignition">
         <div class="storage-item" data-name="data-signalk-path" data-value="electrical.switches.16.16.state"></div>
         <div class="storage-item" data-name="data-widget-display-mode.0" data-value='{ "onvalue": "IGN" }'></div>
@@ -72,14 +77,14 @@
     </div>
     
     <div class="storage-group" data-name="shorepower">
-        <div class="storage-item" data-name="data-signalk-path" data-value="electrical.inverters.257.acin.power"></div>
+        <div class="storage-item" data-name="data-signalk-path" data-value="electrical.inverters.257.acin2.power"></div>
         <div class="storage-item" data-name="data-filter" data-value="multiply"></div>
    	    <div class="storage-item" data-name="data-widget-display-mode.0" data-value='{ "name": "kW", "min": 0, "max": 10, "ticks": 10, "factor": 0.001, "offset": 0, "places": 1 }'></div>
    	    <div class="storage-item" data-name="data-widget-display-mode.1" data-value='{ "name": "W", "min": 0, "max": 10000, "ticks": 10, "factor": 1.0, "offset": 0, "places": 0 }'></div>
     </div>
 
     <div class="storage-group" data-name="genpower">
-        <div class="storage-item" data-name="data-signalk-path" data-value="electrical.inverters.257.acin2.power"></div>
+        <div class="storage-item" data-name="data-signalk-path" data-value="electrical.inverters.257.acin.power"></div>
         <div class="storage-item" data-name="data-filter" data-value="multiply"></div>
    	    <div class="storage-item" data-name="data-widget-display-mode.0" data-value='{ "name": "kW", "min": 0, "max": 10, "ticks": 10, "factor": 0.001, "offset": 0, "places": 1 }'></div>
    	    <div class="storage-item" data-name="data-widget-display-mode.1" data-value='{ "name": "W", "min": 0, "max": 10000, "ticks": 10, "factor": 1.0, "offset": 0, "places": 0 }'></div>
@@ -140,7 +145,7 @@
     </div>
 
     <div class="storage-group" data-name="charge">
-        <div class="storage-item" data-name="data-signalk-path" data-value="elextrical.batteries.258.stateOfCharge"></div>
+        <div class="storage-item" data-name="data-signalk-path" data-value="electrical.batteries.258.capacity.stateOfCharge"></div>
         <div class="storage-item" data-name="data-filter" data-value="multiply"></div>
     	<div class="storage-item" data-name="data-widget-display-mode.0" data-value='{ "name": "%", "min": 0, "max": 100, "ticks": 10, "factor": 100.0, "offset": 0, "places": 0 }'></div>
     </div>
