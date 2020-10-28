@@ -1,0 +1,6 @@
+[submodule "lib/signalk-client"]
+	path = lib/signalk-client
+	url = https://github.com/preeve9534/signalk-client
+[submodule "lib/page-utils"]
+	path = lib/page-utils
+	url = https://github.com/preeve9534/page-utils
